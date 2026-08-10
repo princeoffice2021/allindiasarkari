@@ -1,0 +1,6 @@
+{
+  "name": "All India Sarkari",
+  "description": "All India Sarkari - Sarkari Yojana, Sarkari Naukri, Result, Admit Card, Answer Key, Syllabus, Scholarship and Exam Updates across India.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
