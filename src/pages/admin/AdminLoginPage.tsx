@@ -38,13 +38,6 @@ export const AdminLoginPage: React.FC = () => {
         });
 
         if (error) {
-          // Dev-only fallback if developers are testing without creating a user in Supabase console
-          if (import.meta.env.DEV && email === 'admin@allindiasarkari.com' && password === 'admin123') {
-            localStorage.setItem('admin_authenticated', 'true');
-            localStorage.setItem('admin_email', email);
-            navigate('/admin');
-            return;
-          }
           setErrorMsg(error.message || 'Authentication failed. Please check your credentials.');
           setLoading(false);
           return;
@@ -57,19 +50,7 @@ export const AdminLoginPage: React.FC = () => {
           return;
         }
       } else {
-        if (import.meta.env.DEV) {
-          // Development-only fallback when Supabase is not configured
-          if (email === 'admin@allindiasarkari.com' && password === 'admin123') {
-            localStorage.setItem('admin_authenticated', 'true');
-            localStorage.setItem('admin_email', email);
-            navigate('/admin');
-            return;
-          } else {
-            setErrorMsg('Development mode: Enter admin@allindiasarkari.com and admin123');
-          }
-        } else {
-          setErrorMsg('Supabase Auth is not configured. Production environment requires valid VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
-        }
+        setErrorMsg('Supabase Auth is not configured. Production environment requires valid VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
       }
     } catch (err: any) {
       setErrorMsg(err.message || 'Login failed. Please check credentials.');
@@ -144,17 +125,6 @@ export const AdminLoginPage: React.FC = () => {
             <ArrowRight className="h-4 w-4" />
           </button>
         </form>
-
-        {import.meta.env.DEV && (
-          <div className="rounded-xl bg-slate-50 border border-slate-200 p-3 text-[11px] text-slate-500 space-y-1">
-            <p className="font-bold text-slate-700">Development Demo Notice:</p>
-            <p><strong>Email:</strong> admin@allindiasarkari.com</p>
-            <p><strong>Password:</strong> admin123</p>
-            <p className="text-[10px] text-slate-400 pt-1">
-              (For production, create your admin user accounts in Supabase Auth Console)
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
