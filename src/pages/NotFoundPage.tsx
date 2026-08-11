@@ -9,6 +9,7 @@ export const NotFoundPage: React.FC = () => {
     updateSEO({
       title: '404 - Page Not Found | All India Sarkari',
       description: 'The requested government notification or page could not be found.',
+      noindex: true,
     });
   }, []);
 

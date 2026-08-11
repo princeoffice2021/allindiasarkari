@@ -18,10 +18,21 @@ export const AdminLoginPage: React.FC = () => {
       noindex: true,
     });
 
-    // Check if already authenticated
-    if (localStorage.getItem('admin_authenticated') === 'true') {
-      navigate('/admin');
+    // Check if already authenticated via active Supabase session or fallback
+    async function checkExistingSession() {
+      if (isSupabaseConfigured && supabase) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          navigate('/admin', { replace: true });
+        } else {
+          localStorage.removeItem('admin_authenticated');
+          localStorage.removeItem('admin_email');
+        }
+      } else if (localStorage.getItem('admin_authenticated') === 'true') {
+        navigate('/admin', { replace: true });
+      }
     }
+    checkExistingSession();
   }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {

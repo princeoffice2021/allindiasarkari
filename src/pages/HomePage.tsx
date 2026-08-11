@@ -37,7 +37,22 @@ export const HomePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    updateSEO();
+    updateSEO({
+      title: 'All India Sarkari - Sarkari Yojana, Naukri, Result & Exam Updates',
+      description: 'Government schemes, Sarkari Naukri, exam results, admit cards, answer keys, syllabus, scholarships and latest government job updates across India.',
+      canonicalUrl: '/',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'All India Sarkari',
+        url: 'https://allindiasarkari.com',
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: 'https://allindiasarkari.com/search?q={search_term_string}',
+          'query-input': 'required name=search_term_string',
+        },
+      },
+    });
 
     async function loadData() {
       setLoading(true);

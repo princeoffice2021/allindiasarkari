@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface AdSlotProps {
   slotId?: string;
@@ -14,6 +14,28 @@ export const AdSlot: React.FC<AdSlotProps> = ({
   label = 'Advertisement',
 }) => {
   const adClientId = import.meta.env.VITE_ADSENSE_CLIENT_ID || '';
+
+  useEffect(() => {
+    if (!adClientId) return;
+
+    // Load AdSense script once if not already present
+    const scriptId = 'adsense-script';
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement('script');
+      script.id = scriptId;
+      script.async = true;
+      script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adClientId}`;
+      script.crossOrigin = 'anonymous';
+      document.head.appendChild(script);
+    }
+
+    // Push ad slot safely
+    try {
+      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+    } catch (e) {
+      console.warn('AdSense slot initialization:', e);
+    }
+  }, [adClientId, slotId]);
 
   return (
     <div className={`my-4 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 p-2 text-center ${className}`}>
@@ -40,3 +62,4 @@ export const AdSlot: React.FC<AdSlotProps> = ({
     </div>
   );
 };
+

@@ -29,7 +29,7 @@ export const AdminSettingsPage: React.FC = () => {
     defaultMetaDescription: 'All India Sarkari - Real-time updates on Indian Sarkari Naukri, Results, Admit Cards, and Schemes.',
     defaultOgImage: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=800',
     googleSearchConsole: '',
-    adsenseClientId: import.meta.env.VITE_ADSENSE_CLIENT_ID || 'ca-pub-xxxxxxxxxxxxxxxx',
+    adsenseClientId: import.meta.env.VITE_ADSENSE_CLIENT_ID || '',
     adsenseEnabled: false,
   });
 

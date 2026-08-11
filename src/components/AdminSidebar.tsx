@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import {
   LayoutDashboard,
   FileText,
@@ -26,11 +27,20 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin_authenticated');
-    localStorage.removeItem('admin_email');
-    navigate('/admin/login');
+  const handleLogout = async () => {
+    try {
+      if (isSupabaseConfigured && supabase) {
+        await supabase.auth.signOut();
+      }
+    } catch (e) {
+      console.warn('Supabase signout:', e);
+    } finally {
+      localStorage.removeItem('admin_authenticated');
+      localStorage.removeItem('admin_email');
+      navigate('/admin/login');
+    }
   };
+
 
   const menuItems = [
     { label: 'Dashboard', path: '/admin', icon: LayoutDashboard },

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
+import { BASE_URL } from '../lib/seo';
 
 export interface BreadcrumbItem {
   label: string;
@@ -24,7 +25,9 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, className = '' 
         '@type': 'ListItem',
         position: idx + 1,
         name: item.label,
-        item: item.url ? `https://allindiasarkari.com${item.url}` : undefined,
+        item: item.url
+          ? `${BASE_URL.replace(/\/+$/, '')}${item.url.startsWith('/') ? '' : '/'}${item.url}`
+          : undefined,
       })),
     };
 

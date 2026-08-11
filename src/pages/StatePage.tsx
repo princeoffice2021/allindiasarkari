@@ -8,6 +8,7 @@ import { Sidebar } from '../components/Sidebar';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { AdSlot } from '../components/AdSlot';
 import { slugToState, ALL_INDIAN_STATES, stateToSlug } from '../data/statesAndCategories';
+import { NotFoundPage } from './NotFoundPage';
 import { MapPin, Building2, ChevronRight } from 'lucide-react';
 
 export const StatePage: React.FC = () => {
@@ -49,15 +50,7 @@ export const StatePage: React.FC = () => {
   }, [stateName, stateSlug, currentPage, selectedCategory]);
 
   if (!stateName) {
-    return (
-      <div className="py-12 text-center space-y-4">
-        <h1 className="text-2xl font-bold text-slate-900">State Not Found</h1>
-        <p className="text-sm text-slate-600">The requested state or union territory could not be recognized.</p>
-        <Link to="/sarkari-naukri" className="text-sm font-bold text-blue-800 hover:underline">
-          ← View All States Jobs
-        </Link>
-      </div>
-    );
+    return <NotFoundPage />;
   }
 
   const handlePageChange = (newPage: number) => {

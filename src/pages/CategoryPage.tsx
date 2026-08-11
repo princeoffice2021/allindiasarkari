@@ -7,6 +7,7 @@ import { PostList } from '../components/PostList';
 import { Sidebar } from '../components/Sidebar';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { AdSlot } from '../components/AdSlot';
+import { NotFoundPage } from './NotFoundPage';
 import {
   CATEGORIES_CONFIG,
   ALL_INDIAN_STATES,
@@ -53,13 +54,9 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ forcedCategory }) =>
   }, [categoryName, categorySlug, currentPage, selectedState]);
 
   if (!categoryName) {
-    return (
-      <div className="py-12 text-center space-y-4">
-        <h1 className="text-2xl font-bold text-slate-900">Category Not Found</h1>
-        <p className="text-sm text-slate-600">The requested category does not exist.</p>
-      </div>
-    );
+    return <NotFoundPage />;
   }
+
 
   const handleStateFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;

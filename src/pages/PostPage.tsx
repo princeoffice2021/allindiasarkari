@@ -54,11 +54,16 @@ export const PostPage: React.FC = () => {
           jsonLd: {
             '@context': 'https://schema.org',
             '@type': 'NewsArticle',
+            url: `https://allindiasarkari.com/post/${foundPost.slug}`,
+            mainEntityOfPage: {
+              '@type': 'WebPage',
+              '@id': `https://allindiasarkari.com/post/${foundPost.slug}`,
+            },
             headline: foundPost.title,
-            description: foundPost.excerpt,
+            description: foundPost.meta_description || foundPost.excerpt,
             image: [foundPost.image_url || 'https://allindiasarkari.com/icon.png'],
             datePublished: foundPost.created_at,
-            dateModified: foundPost.updated_at,
+            dateModified: foundPost.updated_at || foundPost.created_at,
             author: {
               '@type': 'Organization',
               name: 'All India Sarkari',
@@ -92,6 +97,12 @@ export const PostPage: React.FC = () => {
   }
 
   if (!post) {
+    updateSEO({
+      title: '404 - Post Not Found | All India Sarkari',
+      description: 'The requested government article or notification could not be found.',
+      noindex: true,
+    });
+
     return (
       <div className="py-16 text-center space-y-4 max-w-lg mx-auto bg-white rounded-xl border border-slate-200 p-8 shadow-xs">
         <h1 className="text-2xl font-bold text-slate-900">Post Not Found</h1>

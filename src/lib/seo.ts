@@ -32,7 +32,15 @@ export function updateSEO({
   const finalTitle = title ? `${title} | All India Sarkari` : DEFAULT_TITLE;
   const finalDesc = description || DEFAULT_DESCRIPTION;
   const finalImage = ogImage || DEFAULT_IMAGE;
-  const finalCanonical = canonicalUrl ? `${BASE_URL}${canonicalUrl}` : BASE_URL;
+  let finalCanonical = BASE_URL;
+  if (canonicalUrl) {
+    if (canonicalUrl.startsWith('http://') || canonicalUrl.startsWith('https://')) {
+      finalCanonical = canonicalUrl;
+    } else {
+      const path = canonicalUrl.startsWith('/') ? canonicalUrl : `/${canonicalUrl}`;
+      finalCanonical = `${BASE_URL.replace(/\/+$/, '')}${path}`;
+    }
+  }
 
   // Update Title
   document.title = finalTitle;

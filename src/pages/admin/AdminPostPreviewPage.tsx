@@ -124,7 +124,7 @@ export const AdminPostPreviewPage: React.FC = () => {
             </div>
           </header>
 
-          <AdSlot type="banner" label="Advertisement" />
+          <AdSlot format="horizontal" label="Advertisement" />
 
           {post.image_url && (
             <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-2xs bg-slate-100">
