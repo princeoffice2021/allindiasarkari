@@ -146,10 +146,10 @@ export const PostPage: React.FC = () => {
         ]}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Main Article Container */}
-        <main className="lg:col-span-8 space-y-6">
-          <article className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-8 shadow-xs space-y-6">
+        <main className="lg:col-span-8 space-y-6 min-w-0">
+          <article className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 md:p-8 shadow-xs space-y-6 overflow-hidden">
             {/* Header Meta */}
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-2">
@@ -191,11 +191,11 @@ export const PostPage: React.FC = () => {
 
             {/* Featured Image */}
             {post.image_url && (
-              <div className="overflow-hidden rounded-xl border border-slate-200 shadow-xs">
+              <div className="overflow-hidden rounded-xl border border-slate-200 shadow-xs max-h-[440px] bg-slate-50">
                 <img
                   src={post.image_url}
                   alt={post.title}
-                  className="w-full max-h-[420px] object-cover"
+                  className="w-full h-full object-cover max-h-[440px]"
                 />
               </div>
             )}
@@ -205,23 +205,16 @@ export const PostPage: React.FC = () => {
 
             {/* Excerpt Box */}
             {post.excerpt && (
-              <div className="rounded-xl border-l-4 border-blue-900 bg-blue-50/70 p-4 text-sm font-medium text-slate-800 leading-relaxed">
+              <div className="rounded-xl border-l-4 border-blue-900 bg-blue-50/70 p-4 text-sm font-medium text-slate-800 leading-relaxed shadow-2xs">
                 <strong className="text-blue-950 font-black block mb-1">Summary / Highlights:</strong>
                 {post.excerpt}
               </div>
             )}
 
-            {/* Article Content Body */}
-            <div
-              className="prose prose-slate max-w-none text-slate-800 text-sm sm:text-base leading-relaxed space-y-4
-                         prose-headings:font-black prose-headings:text-slate-900 prose-headings:tracking-tight
-                         prose-h2:text-xl prose-h2:sm:text-2xl prose-h2:border-b prose-h2:border-slate-200 prose-h2:pb-2 prose-h2:mt-6
-                         prose-h3:text-lg prose-h3:sm:text-xl prose-h3:text-blue-900
-                         prose-a:text-blue-800 prose-a:font-bold prose-a:underline hover:prose-a:text-blue-950
-                         prose-ul:list-disc prose-ul:pl-5 prose-ol:list-decimal prose-ol:pl-5
-                         prose-li:my-1 prose-table:w-full prose-table:border-collapse prose-td:border prose-td:border-slate-300 prose-td:p-2 prose-th:border prose-th:border-slate-300 prose-th:bg-slate-100 prose-th:p-2"
-              dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-            />
+            {/* Article Content Body with Safe Custom Typography & Table Auto-Scroll */}
+            <div className="article-content overflow-x-auto">
+              <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
+            </div>
 
             {/* In-Article Middle Ad */}
             <AdSlot format="horizontal" label="Advertisement" />
@@ -247,7 +240,7 @@ export const PostPage: React.FC = () => {
 
             {/* Official Source Link Box */}
             {getSafeUrl(post.official_source_url) && (
-              <div className="rounded-xl border border-blue-200 bg-blue-50/80 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+              <div className="rounded-xl border border-blue-200 bg-blue-50/80 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
                 <div>
                   <span className="text-xs font-black text-blue-900 uppercase tracking-wider block mb-0.5">
                     Official Government Portal / Source
@@ -314,9 +307,9 @@ export const PostPage: React.FC = () => {
         </main>
 
         {/* Sidebar */}
-        <div className="lg:col-span-4">
+        <aside className="lg:col-span-4 min-w-0">
           <Sidebar />
-        </div>
+        </aside>
       </div>
     </div>
   );

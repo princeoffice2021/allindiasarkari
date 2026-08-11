@@ -136,10 +136,12 @@ export const AdminPostPreviewPage: React.FC = () => {
             </div>
           )}
 
-          <div
-            className="prose prose-slate max-w-none bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-2xs leading-relaxed text-sm sm:text-base text-slate-800"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
+          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+            <div
+              className="article-content overflow-x-auto"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
+          </div>
 
           <ShareButtons title={post.title} url={currentUrl} />
         </div>
