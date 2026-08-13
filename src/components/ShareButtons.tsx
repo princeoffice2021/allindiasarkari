@@ -36,6 +36,7 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
             href={`https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}`}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Share on WhatsApp"
             className="flex items-center gap-1.5 rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-emerald-700 transition-colors"
             title="Share on WhatsApp"
           >
@@ -48,6 +49,7 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
             href={`https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Share on Telegram"
             className="flex items-center gap-1.5 rounded-md bg-sky-500 px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-sky-600 transition-colors"
             title="Share on Telegram"
           >
@@ -60,6 +62,7 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
             href={`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Share on Twitter"
             className="flex items-center gap-1.5 rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-black transition-colors"
             title="Share on Twitter"
           >
@@ -72,6 +75,7 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
             href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Share on Facebook"
             className="flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-blue-700 transition-colors"
             title="Share on Facebook"
           >
@@ -82,6 +86,7 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
           {/* Copy Link */}
           <button
             onClick={handleCopy}
+            aria-label="Copy article link to clipboard"
             className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold text-slate-700 border border-slate-300 bg-slate-50 hover:bg-slate-100 transition-colors ${
               copied ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : ''
             }`}

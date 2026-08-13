@@ -17,6 +17,7 @@ import { ContactPage } from './pages/ContactPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { DisclaimerPage } from './pages/DisclaimerPage';
 import { TermsPage } from './pages/TermsPage';
+import { EditorialPolicyPage } from './pages/EditorialPolicyPage';
 import { SitemapPage } from './pages/SitemapPage';
 import { RobotsPage } from './pages/RobotsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -99,6 +100,8 @@ function MainLayout() {
             <Route path="/privacy-policy" element={<PrivacyPage />} />
             <Route path="/disclaimer" element={<DisclaimerPage />} />
             <Route path="/terms-and-conditions" element={<TermsPage />} />
+            <Route path="/editorial-policy" element={<EditorialPolicyPage />} />
+            <Route path="/content-policy" element={<EditorialPolicyPage />} />
 
             {/* Sitemap & Robots */}
             <Route path="/sitemap.xml" element={<SitemapPage />} />

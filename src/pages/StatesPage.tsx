@@ -13,6 +13,24 @@ export const StatesPage: React.FC = () => {
       title: 'State Wise Sarkari Naukri 2026 - All 28 States & 8 UT Govt Jobs',
       description: 'Find latest state government jobs, recruitment notifications, results and admit cards across all 28 Indian States & 8 Union Territories.',
       canonicalUrl: '/states',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: 'https://allindiasarkari.com/',
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'State Wise Jobs',
+            item: 'https://allindiasarkari.com/states',
+          },
+        ],
+      },
     });
   }, []);
 

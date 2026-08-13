@@ -90,7 +90,7 @@ export const Footer: React.FC = () => {
         {/* Col 4: Legal & Important */}
         <div className="space-y-3">
           <h4 className="text-xs font-bold uppercase tracking-wider text-white border-b border-slate-800 pb-2">
-            Important & Legal
+            Important & Trust
           </h4>
           <ul className="space-y-2">
             <li>
@@ -101,6 +101,11 @@ export const Footer: React.FC = () => {
             <li>
               <Link to="/contact" className="hover:text-amber-300 transition-colors">
                 Contact Us
+              </Link>
+            </li>
+            <li>
+              <Link to="/editorial-policy" className="hover:text-amber-300 transition-colors">
+                Editorial & Content Policy
               </Link>
             </li>
             <li>
@@ -116,6 +121,11 @@ export const Footer: React.FC = () => {
             <li>
               <Link to="/terms-and-conditions" className="hover:text-amber-300 transition-colors">
                 Terms & Conditions
+              </Link>
+            </li>
+            <li>
+              <Link to="/sitemap" className="hover:text-amber-300 transition-colors">
+                HTML / XML Sitemap
               </Link>
             </li>
             <li>

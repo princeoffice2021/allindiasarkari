@@ -40,6 +40,30 @@ export const StatePage: React.FC = () => {
       title: `${stateName} ${selectedCategory !== 'All' ? selectedCategory : 'Sarkari Naukri'} 2026 - Latest Govt Jobs & Updates`,
       description: `Find all latest ${stateName} government job vacancies, state recruitment notifications, result, admit cards & exam updates.`,
       canonicalUrl: `/sarkari-naukri/${stateSlug}`,
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: 'https://allindiasarkari.com/',
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'State Jobs',
+            item: 'https://allindiasarkari.com/states',
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: `${stateName} Jobs`,
+            item: `https://allindiasarkari.com/sarkari-naukri/${stateSlug}`,
+          },
+        ],
+      },
     });
 
     getPostsByState(stateName, currentPage, 12, selectedCategory).then((res) => {

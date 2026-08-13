@@ -38,6 +38,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholder}
+          aria-label="Search government jobs, schemes, results and exams"
           className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-10 text-sm text-slate-800 placeholder-slate-400 shadow-2xs focus:border-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-800/20"
         />
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
@@ -46,6 +47,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           <button
             type="button"
             onClick={handleClear}
+            aria-label="Clear search input"
             className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
           >
             <X className="h-4 w-4" />
@@ -54,6 +56,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       </div>
       <button
         type="submit"
+        aria-label="Submit search query"
         className="ml-2 rounded-lg bg-blue-800 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-blue-900 transition-colors shrink-0"
       >
         Search

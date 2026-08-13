@@ -38,7 +38,10 @@ export const PostPage: React.FC = () => {
     getPostBySlug(slug).then((foundPost) => {
       setPost(foundPost);
       if (foundPost) {
-        // Dynamic SEO Update with OpenGraph & Article Metadata
+        const catSlug = categoryToSlug(foundPost.category);
+        const stSlug = foundPost.state ? stateToSlug(foundPost.state) : null;
+
+        // Dynamic SEO Update with OpenGraph, Article Metadata & Schema Graph
         updateSEO({
           title: foundPost.title,
           description: foundPost.meta_description || foundPost.excerpt,
@@ -53,30 +56,77 @@ export const PostPage: React.FC = () => {
           },
           jsonLd: {
             '@context': 'https://schema.org',
-            '@type': 'NewsArticle',
-            url: `https://allindiasarkari.com/post/${foundPost.slug}`,
-            mainEntityOfPage: {
-              '@type': 'WebPage',
-              '@id': `https://allindiasarkari.com/post/${foundPost.slug}`,
-            },
-            headline: foundPost.title,
-            description: foundPost.meta_description || foundPost.excerpt,
-            image: [foundPost.image_url || 'https://allindiasarkari.com/icon.png'],
-            datePublished: foundPost.created_at,
-            dateModified: foundPost.updated_at || foundPost.created_at,
-            author: {
-              '@type': 'Organization',
-              name: 'All India Sarkari',
-              url: 'https://allindiasarkari.com',
-            },
-            publisher: {
-              '@type': 'Organization',
-              name: 'All India Sarkari',
-              logo: {
-                '@type': 'ImageObject',
-                url: 'https://allindiasarkari.com/logo.png',
+            '@graph': [
+              {
+                '@type': 'NewsArticle',
+                '@id': `https://allindiasarkari.com/post/${foundPost.slug}#article`,
+                isPartOf: {
+                  '@type': 'WebPage',
+                  '@id': `https://allindiasarkari.com/post/${foundPost.slug}`,
+                },
+                headline: foundPost.title,
+                description: foundPost.meta_description || foundPost.excerpt,
+                image: [foundPost.image_url || 'https://allindiasarkari.com/icon.png'],
+                datePublished: foundPost.created_at,
+                dateModified: foundPost.updated_at || foundPost.created_at,
+                mainEntityOfPage: `https://allindiasarkari.com/post/${foundPost.slug}`,
+                author: {
+                  '@type': 'Organization',
+                  name: 'All India Sarkari Editorial Desk',
+                  url: 'https://allindiasarkari.com/about',
+                },
+                publisher: {
+                  '@type': 'Organization',
+                  name: 'All India Sarkari',
+                  url: 'https://allindiasarkari.com',
+                  logo: {
+                    '@type': 'ImageObject',
+                    url: 'https://allindiasarkari.com/icon.png',
+                  },
+                },
               },
-            },
+              {
+                '@type': 'BreadcrumbList',
+                '@id': `https://allindiasarkari.com/post/${foundPost.slug}#breadcrumb`,
+                itemListElement: [
+                  {
+                    '@type': 'ListItem',
+                    position: 1,
+                    name: 'Home',
+                    item: 'https://allindiasarkari.com/',
+                  },
+                  {
+                    '@type': 'ListItem',
+                    position: 2,
+                    name: foundPost.category,
+                    item: `https://allindiasarkari.com/${catSlug}`,
+                  },
+                  ...(stSlug && foundPost.state
+                    ? [
+                        {
+                          '@type': 'ListItem',
+                          position: 3,
+                          name: `${foundPost.state} Jobs`,
+                          item: `https://allindiasarkari.com/sarkari-naukri/${stSlug}`,
+                        },
+                        {
+                          '@type': 'ListItem',
+                          position: 4,
+                          name: foundPost.title,
+                          item: `https://allindiasarkari.com/post/${foundPost.slug}`,
+                        },
+                      ]
+                    : [
+                        {
+                          '@type': 'ListItem',
+                          position: 3,
+                          name: foundPost.title,
+                          item: `https://allindiasarkari.com/post/${foundPost.slug}`,
+                        },
+                      ]),
+                ],
+              },
+            ],
           },
         });
 
@@ -195,6 +245,8 @@ export const PostPage: React.FC = () => {
                 <img
                   src={post.image_url}
                   alt={post.title}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover max-h-[440px]"
                 />
               </div>

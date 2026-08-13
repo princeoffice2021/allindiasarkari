@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Core Home -->
   <url>
     <loc>https://allindiasarkari.com/</loc>
     <changefreq>hourly</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Categories -->
   <url>
     <loc>https://allindiasarkari.com/sarkari-yojana</loc>
     <changefreq>daily</changefreq>
@@ -50,4 +53,42 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+
+  <!-- Trust, Legal & Editorial Pages -->
+  <url>
+    <loc>https://allindiasarkari.com/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://allindiasarkari.com/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://allindiasarkari.com/editorial-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://allindiasarkari.com/privacy-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://allindiasarkari.com/disclaimer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://allindiasarkari.com/terms-and-conditions</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://allindiasarkari.com/sitemap</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>
+

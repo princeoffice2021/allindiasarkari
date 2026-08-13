@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface AdSlotProps {
   slotId?: string;
@@ -8,15 +8,16 @@ interface AdSlotProps {
 }
 
 export const AdSlot: React.FC<AdSlotProps> = ({
-  slotId = '1234567890',
+  slotId,
   format = 'auto',
   className = '',
   label = 'Advertisement',
 }) => {
   const adClientId = import.meta.env.VITE_ADSENSE_CLIENT_ID || '';
+  const adInitializedRef = useRef(false);
 
   useEffect(() => {
-    if (!adClientId) return;
+    if (!adClientId || !slotId) return;
 
     // Load AdSense script once if not already present
     const scriptId = 'adsense-script';
@@ -29,37 +30,41 @@ export const AdSlot: React.FC<AdSlotProps> = ({
       document.head.appendChild(script);
     }
 
-    // Push ad slot safely
-    try {
-      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
-    } catch (e) {
-      console.warn('AdSense slot initialization:', e);
+    // Push ad slot safely once per mount
+    if (!adInitializedRef.current) {
+      adInitializedRef.current = true;
+      try {
+        ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+      } catch (e) {
+        // Silently handle ad-blocker or script load delays
+      }
     }
   }, [adClientId, slotId]);
 
+  // If no AdSense Client ID is configured in the environment, do NOT display empty or placeholder ad containers
+  // to maintain Google AdSense policy compliance and prevent Cumulative Layout Shift (CLS).
+  if (!adClientId || !slotId) {
+    return null;
+  }
+
   return (
-    <div className={`my-4 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 p-2 text-center ${className}`}>
-      <div className="mb-1 text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
+    <div
+      className={`my-6 overflow-hidden rounded-xl border border-slate-200 bg-slate-50/60 p-2.5 text-center ${className}`}
+      aria-label="Sponsored advertisement"
+    >
+      <div className="mb-1.5 text-[10px] font-bold tracking-widest text-slate-400 uppercase select-none">
         {label}
       </div>
-      {adClientId ? (
-        <ins
-          className="adsbygoogle block"
-          style={{ display: 'block' }}
-          data-ad-client={adClientId}
-          data-ad-slot={slotId}
-          data-ad-format={format}
-          data-full-width-responsive="true"
-        />
-      ) : (
-        <div className="flex h-20 items-center justify-center rounded border border-dashed border-slate-300 bg-white p-3 text-xs text-slate-500 shadow-2xs">
-          <div className="space-y-1">
-            <p className="font-semibold text-slate-700">Google AdSense Space</p>
-            <p className="text-[11px] text-slate-400">Add VITE_ADSENSE_CLIENT_ID in env to activate live ads</p>
-          </div>
-        </div>
-      )}
+      <ins
+        className="adsbygoogle block"
+        style={{ display: 'block' }}
+        data-ad-client={adClientId}
+        data-ad-slot={slotId}
+        data-ad-format={format}
+        data-full-width-responsive="true"
+      />
     </div>
   );
 };
+
 

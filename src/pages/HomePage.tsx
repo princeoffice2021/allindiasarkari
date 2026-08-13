@@ -43,14 +43,30 @@ export const HomePage: React.FC = () => {
       canonicalUrl: '/',
       jsonLd: {
         '@context': 'https://schema.org',
-        '@type': 'WebSite',
-        name: 'All India Sarkari',
-        url: 'https://allindiasarkari.com',
-        potentialAction: {
-          '@type': 'SearchAction',
-          target: 'https://allindiasarkari.com/search?q={search_term_string}',
-          'query-input': 'required name=search_term_string',
-        },
+        '@graph': [
+          {
+            '@type': 'WebSite',
+            '@id': 'https://allindiasarkari.com/#website',
+            name: 'All India Sarkari',
+            url: 'https://allindiasarkari.com',
+            description: 'Government schemes, Sarkari Naukri, exam results, admit cards, answer keys, syllabus, scholarships and latest government job updates across India.',
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: 'https://allindiasarkari.com/search?q={search_term_string}',
+              'query-input': 'required name=search_term_string',
+            },
+          },
+          {
+            '@type': 'Organization',
+            '@id': 'https://allindiasarkari.com/#organization',
+            name: 'All India Sarkari',
+            url: 'https://allindiasarkari.com',
+            logo: {
+              '@type': 'ImageObject',
+              url: 'https://allindiasarkari.com/icon.png',
+            },
+          },
+        ],
       },
     });
 

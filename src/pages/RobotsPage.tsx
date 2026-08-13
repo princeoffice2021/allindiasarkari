@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { updateSEO } from '../lib/seo';
 import { FileText } from 'lucide-react';
 
 export const RobotsPage: React.FC = () => {
+  useEffect(() => {
+    updateSEO({
+      title: 'Robots.txt Directive - All India Sarkari',
+      description: 'Crawl and indexing directives for search engine bots visiting allindiasarkari.com.',
+      canonicalUrl: '/robots.txt',
+    });
+  }, []);
+
   const robotsTxt = `User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin/*
-Disallow: /api/private
+Disallow: /search
 
 Sitemap: https://allindiasarkari.com/sitemap.xml`;
 

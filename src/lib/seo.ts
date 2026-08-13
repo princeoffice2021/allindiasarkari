@@ -5,6 +5,7 @@ export interface SEOProps {
   ogType?: string;
   ogImage?: string;
   noindex?: boolean;
+  robots?: string;
   articleMeta?: {
     publishedTime?: string;
     modifiedTime?: string;
@@ -17,7 +18,7 @@ export interface SEOProps {
 const DEFAULT_TITLE = 'All India Sarkari - Sarkari Yojana, Naukri, Result & Exam Updates';
 const DEFAULT_DESCRIPTION = 'Government schemes, Sarkari Naukri, exam results, admit cards, answer keys, syllabus, scholarships and latest government job updates across India.';
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1595009552535-be753447727e?auto=format&fit=crop&q=80&w=1200';
-export const BASE_URL = import.meta.env.VITE_SITE_URL || 'https://allindiasarkari.com';
+export const BASE_URL = (import.meta.env.VITE_SITE_URL || 'https://allindiasarkari.com').replace(/\/+$/, '');
 
 export function updateSEO({
   title,
@@ -26,19 +27,30 @@ export function updateSEO({
   ogType = 'website',
   ogImage,
   noindex = false,
+  robots,
   articleMeta,
   jsonLd,
 }: SEOProps = {}) {
-  const finalTitle = title ? `${title} | All India Sarkari` : DEFAULT_TITLE;
+  let finalTitle = DEFAULT_TITLE;
+  if (title) {
+    const trimmedTitle = title.trim();
+    if (/all india sarkari/i.test(trimmedTitle)) {
+      finalTitle = trimmedTitle;
+    } else {
+      finalTitle = `${trimmedTitle} | All India Sarkari`;
+    }
+  }
+
   const finalDesc = description || DEFAULT_DESCRIPTION;
   const finalImage = ogImage || DEFAULT_IMAGE;
+  
   let finalCanonical = BASE_URL;
   if (canonicalUrl) {
     if (canonicalUrl.startsWith('http://') || canonicalUrl.startsWith('https://')) {
       finalCanonical = canonicalUrl;
     } else {
-      const path = canonicalUrl.startsWith('/') ? canonicalUrl : `/${canonicalUrl}`;
-      finalCanonical = `${BASE_URL.replace(/\/+$/, '')}${path}`;
+      const cleanPath = canonicalUrl.replace(/^\/+/, '');
+      finalCanonical = cleanPath ? `${BASE_URL}/${cleanPath}` : BASE_URL;
     }
   }
 
@@ -49,7 +61,9 @@ export function updateSEO({
   setMetaTag('description', finalDesc);
 
   // Update Robots Indexing
-  if (noindex) {
+  if (robots) {
+    setMetaTag('robots', robots);
+  } else if (noindex) {
     setMetaTag('robots', 'noindex, nofollow');
   } else {
     setMetaTag('robots', 'index, follow');

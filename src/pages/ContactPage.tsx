@@ -2,22 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { updateSEO } from '../lib/seo';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { Sidebar } from '../components/Sidebar';
-import { Mail, Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Mail, Send, CheckCircle2, AlertCircle, Clock, MapPin, ShieldAlert, MessageSquare } from 'lucide-react';
 
 export const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    subject: '',
+    subjectCategory: 'Correction / Post Update',
+    customSubject: '',
     message: '',
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     updateSEO({
-      title: 'Contact Us - All India Sarkari',
-      description: 'Get in touch with the All India Sarkari editorial team for feedback, correction requests, or business inquiries.',
+      title: 'Contact Us - All India Sarkari (allindiasarkari.com)',
+      description: 'Contact the All India Sarkari editorial desk for article corrections, notification inquiries, feedback, or editorial questions.',
       canonicalUrl: '/contact',
     });
   }, []);
@@ -25,7 +27,11 @@ export const ContactPage: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.name && formData.email && formData.message) {
-      setSubmitted(true);
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+        setSubmitted(true);
+      }, 400);
     }
   };
 
@@ -40,28 +46,79 @@ export const ContactPage: React.FC = () => {
               <Mail className="h-7 w-7 text-blue-800" />
               Contact All India Sarkari
             </h1>
-            <p className="text-xs text-slate-500 mt-1">Have feedback, corrections, or inquiries? Reach out to our team.</p>
+            <p className="text-xs text-slate-500 mt-1">
+              Have feedback, factual corrections, notification inquiries, or partnership questions? Reach out directly.
+            </p>
+          </div>
+
+          {/* Contact Details Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-1.5">
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-900 uppercase">
+                <Mail className="h-4 w-4 text-blue-800" />
+                Editorial & Corrections
+              </div>
+              <p className="text-xs text-slate-600">
+                For notification errors, date extensions, or corrigendum updates:
+              </p>
+              <a
+                href="mailto:editorial@allindiasarkari.com"
+                className="text-xs font-bold text-blue-900 hover:underline block"
+              >
+                editorial@allindiasarkari.com
+              </a>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-1.5">
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-900 uppercase">
+                <MessageSquare className="h-4 w-4 text-emerald-700" />
+                General Inquiries & Support
+              </div>
+              <p className="text-xs text-slate-600">
+                For general questions, technical feedback, or suggestions:
+              </p>
+              <a
+                href="mailto:contact@allindiasarkari.com"
+                className="text-xs font-bold text-blue-900 hover:underline block"
+              >
+                contact@allindiasarkari.com
+              </a>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 text-xs text-slate-600 bg-blue-50/70 border border-blue-200/80 p-3 rounded-xl">
+            <Clock className="h-4 w-4 text-blue-800 shrink-0" />
+            <span>
+              <strong>Editorial Response SLA:</strong> Our team reviews and responds to incoming inquiries within <strong>24 to 48 business hours</strong>.
+            </span>
           </div>
 
           {submitted ? (
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center space-y-3">
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 sm:p-8 text-center space-y-3">
               <CheckCircle2 className="h-12 w-12 text-emerald-600 mx-auto" />
-              <h2 className="text-lg font-bold text-emerald-950">Thank You For Contacting Us!</h2>
-              <p className="text-xs text-emerald-800 max-w-md mx-auto">
-                Your message has been received. Our editorial team will review your inquiry and respond to <strong>{formData.email}</strong> within 24–48 hours.
+              <h2 className="text-lg sm:text-xl font-bold text-emerald-950">Thank You For Reaching Out!</h2>
+              <p className="text-xs sm:text-sm text-emerald-800 max-w-md mx-auto leading-relaxed">
+                Your message regarding <strong>"{formData.subjectCategory}"</strong> has been received by the All India Sarkari team. We will review and reply to <strong>{formData.email}</strong> promptly.
               </p>
               <button
+                type="button"
                 onClick={() => {
                   setSubmitted(false);
-                  setFormData({ name: '', email: '', subject: '', message: '' });
+                  setFormData({
+                    name: '',
+                    email: '',
+                    subjectCategory: 'Correction / Post Update',
+                    customSubject: '',
+                    message: '',
+                  });
                 }}
-                className="mt-2 text-xs font-bold text-blue-900 underline"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-blue-900 px-4 py-2 text-xs font-bold uppercase text-white hover:bg-blue-950 transition-colors"
               >
                 Send Another Message
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 pt-2">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
@@ -92,17 +149,37 @@ export const ContactPage: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Subject / Topic
-                </label>
-                <input
-                  type="text"
-                  value={formData.subject}
-                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  placeholder="e.g. Correction in UP Police Bharti Post"
-                  className="w-full rounded-lg border border-slate-300 p-2.5 text-sm text-slate-800 focus:border-blue-800 focus:outline-hidden"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Topic / Category <span className="text-red-600">*</span>
+                  </label>
+                  <select
+                    value={formData.subjectCategory}
+                    onChange={(e) => setFormData({ ...formData, subjectCategory: e.target.value })}
+                    className="w-full rounded-lg border border-slate-300 p-2.5 text-xs font-semibold text-slate-800 focus:border-blue-800 focus:outline-hidden"
+                  >
+                    <option value="Correction / Post Update">Correction / Post Update</option>
+                    <option value="New Notification Suggestion">New Notification Suggestion</option>
+                    <option value="Broken Link Report">Broken Link Report</option>
+                    <option value="Editorial Feedback">Editorial Feedback</option>
+                    <option value="Privacy / Data Inquiry">Privacy / Data Inquiry</option>
+                    <option value="General Inquiry">General Inquiry</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Specific Subject / Article Title
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.customSubject}
+                    onChange={(e) => setFormData({ ...formData, customSubject: e.target.value })}
+                    placeholder="e.g. SSC GD 2026 application date error"
+                    className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-800 focus:border-blue-800 focus:outline-hidden"
+                  />
+                </div>
               </div>
 
               <div>
@@ -114,23 +191,25 @@ export const ContactPage: React.FC = () => {
                   rows={5}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  placeholder="Type your message or inquiry here..."
-                  className="w-full rounded-lg border border-slate-300 p-2.5 text-sm text-slate-800 focus:border-blue-800 focus:outline-hidden"
+                  placeholder="Please describe your query, feedback, or correction in detail..."
+                  className="w-full rounded-lg border border-slate-300 p-2.5 text-sm text-slate-800 focus:border-blue-800 focus:outline-hidden leading-relaxed"
                 />
               </div>
 
-              <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-500 flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-blue-700 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Note:</strong> We do not ask for personal government IDs or application fees. For official admit card issues or form submission, please visit the respective government board portal directly.
+              <div className="rounded-xl bg-amber-50 border border-amber-200 p-3.5 text-xs text-amber-900 flex items-start gap-2.5">
+                <ShieldAlert className="h-4 w-4 text-amber-700 shrink-0 mt-0.5" />
+                <span className="leading-relaxed">
+                  <strong>Important Notice:</strong> All India Sarkari is an independent information publication. We do not conduct examinations, release admit cards directly, or collect job application fees. For official status checks or candidate grievances regarding specific exam boards, please visit the respective government recruitment authority portal.
                 </span>
               </div>
 
               <button
                 type="submit"
-                className="flex items-center gap-2 rounded-lg bg-blue-900 px-6 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-blue-950 transition-colors"
+                disabled={loading}
+                className="flex items-center gap-2 rounded-xl bg-blue-900 px-7 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-blue-950 transition-colors disabled:opacity-50"
               >
-                <Send className="h-4 w-4" /> Send Message
+                <Send className="h-4 w-4" />
+                {loading ? 'Sending Message...' : 'Submit Message'}
               </button>
             </form>
           )}
@@ -143,3 +222,4 @@ export const ContactPage: React.FC = () => {
     </div>
   );
 };
+

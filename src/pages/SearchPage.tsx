@@ -28,7 +28,8 @@ export const SearchPage: React.FC = () => {
     updateSEO({
       title: query ? `Search: "${query}" - All India Sarkari` : 'Search Govt Jobs & Schemes',
       description: `Search results for ${query || 'Sarkari Yojana, Sarkari Naukri, Results & Admit Cards'}.`,
-      noindex: true,
+      canonicalUrl: '/search',
+      robots: 'noindex, follow',
     });
 
     setLoading(true);

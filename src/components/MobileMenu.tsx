@@ -132,8 +132,11 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
             <div className="flex flex-wrap justify-between gap-2 pt-2 text-[11px] text-slate-500 font-medium">
               <Link to="/about" onClick={onClose} className="hover:underline">About</Link>
               <Link to="/contact" onClick={onClose} className="hover:underline">Contact</Link>
+              <Link to="/editorial-policy" onClick={onClose} className="hover:underline">Editorial</Link>
               <Link to="/privacy-policy" onClick={onClose} className="hover:underline">Privacy</Link>
               <Link to="/disclaimer" onClick={onClose} className="hover:underline">Disclaimer</Link>
+              <Link to="/terms-and-conditions" onClick={onClose} className="hover:underline">Terms</Link>
+              <Link to="/sitemap" onClick={onClose} className="hover:underline">Sitemap</Link>
             </div>
           </div>
         </div>

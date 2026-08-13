@@ -29,6 +29,7 @@ export const AdminPostPreviewPage: React.FC = () => {
           updateSEO({
             title: `[PREVIEW] ${p.title}`,
             description: p.excerpt,
+            noindex: true,
           });
         }
         setLoading(false);

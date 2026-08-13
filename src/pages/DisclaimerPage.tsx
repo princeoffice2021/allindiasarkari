@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { updateSEO } from '../lib/seo';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-import { Sidebar } from '../components/Sidebar';
-import { AlertTriangle } from 'lucide-react';
+ import { Sidebar } from '../components/Sidebar';
+import { AlertTriangle, ShieldAlert, CheckCircle2, FileCheck, HelpCircle } from 'lucide-react';
 
 export const DisclaimerPage: React.FC = () => {
   useEffect(() => {
     updateSEO({
-      title: 'Disclaimer - All India Sarkari',
-      description: 'Official Disclaimer for All India Sarkari (allindiasarkari.com) clarifying independent non-government status.',
+      title: 'Disclaimer - All India Sarkari (allindiasarkari.com)',
+      description: 'Official Legal Disclaimer for All India Sarkari (allindiasarkari.com). Clarifying independent educational non-government status and information verification advice.',
       canonicalUrl: '/disclaimer',
     });
   }, []);
@@ -24,36 +25,61 @@ export const DisclaimerPage: React.FC = () => {
               <AlertTriangle className="h-7 w-7 text-amber-600" />
               Official Disclaimer
             </h1>
-            <p className="text-xs text-slate-500 mt-1">allindiasarkari.com</p>
+            <p className="text-xs text-slate-500 mt-1">allindiasarkari.com • Legal & Non-Affiliation Declaration</p>
           </div>
 
-          <div className="rounded-xl bg-amber-50 border border-amber-300 p-4 text-xs text-amber-950 font-bold leading-relaxed space-y-2">
-            <p className="text-sm text-red-700 font-black uppercase">Important Legal Notice:</p>
-            <p>
-              All India Sarkari (allindiasarkari.com) is NOT an official website of the Government of India, any State Government, Union Territory administration, or statutory recruitment board (such as UPSC, SSC, RRB, NTA, IBPS, or State PSCs).
+          <div className="rounded-xl bg-amber-50 border-2 border-amber-300 p-5 text-xs text-amber-950 font-medium leading-relaxed space-y-2">
+            <div className="flex items-center gap-2 text-sm text-red-700 font-black uppercase">
+              <ShieldAlert className="h-5 w-5 text-red-600 shrink-0" />
+              Crucial Notice to All Visitors & Aspirants
+            </div>
+            <p className="text-slate-800 text-xs sm:text-sm leading-relaxed">
+              <strong>All India Sarkari</strong> (<a href="https://allindiasarkari.com" className="text-blue-900 font-bold underline">https://allindiasarkari.com</a>) is an <strong>independent, privately operated educational and career informational portal</strong>. We are <strong>NOT</strong> an official website of the Government of India, any State Government, Union Territory administration, or any statutory recruitment commission / board (such as UPSC, SSC, RRB, NTA, IBPS, CBSE, State PSCs, or State Police Recruitment Boards).
             </p>
           </div>
 
           <h2 className="text-base font-black text-slate-900 uppercase tracking-wide border-b border-slate-100 pb-1">
-            1. Informational Purpose Only
+            1. Informational & Educational Scope
           </h2>
           <p>
-            All information published on All India Sarkari is for general educational and guidance purposes only. While we make every effort to maintain up-to-date and accurate information extracted from official government employment news bulletins and gazette notifications, we make no representations or warranties of any kind regarding accuracy, completeness, or reliability.
+            The content, exam analysis, syllabus overviews, dates, eligibility details, and application instructions published on All India Sarkari are compiled from publicly available official gazette notifications, Employment News, and department press releases solely for the educational benefit, convenience, and awareness of candidates.
+          </p>
+          <p>
+            While our editorial team endeavors to ensure that all data is current, accurate, and verified, errors or subsequent departmental modifications can happen. We make no representations or warranties of any kind, express or implied, regarding completeness, reliability, or suitability for any specific purpose.
+          </p>
+
+          <h2 className="text-base font-black text-slate-900 uppercase tracking-wide border-b border-slate-100 pb-1 flex items-center gap-2">
+            <FileCheck className="h-4 w-4 text-emerald-700" />
+            2. Mandatory Verification with Official Gazette
+          </h2>
+          <p>
+            Candidates, students, and citizens are <strong>strictly advised to verify all critical eligibility criteria, reservation policies, age calculations, application deadlines, and fee requirements directly from the official department notification PDF / official portal</strong> before submitting online application forms or making financial transactions.
           </p>
 
           <h2 className="text-base font-black text-slate-900 uppercase tracking-wide border-b border-slate-100 pb-1">
-            2. Verify With Official Gazette
+            3. No Monetary Collections or Job Guarantees
           </h2>
           <p>
-            Candidates and users are strictly advised to cross-check all job eligibility criteria, fee submission details, age limits, and notification dates directly on the official department portal specified in each article before filling out application forms or making financial payments.
+            All India Sarkari <strong>NEVER</strong> demands, collects, or solicits money, application fees, coaching charges, or job placement fees from users. We do not guarantee recruitment or selection in any government or public enterprise. Beware of phishing emails, unauthorized calls, or fraudulent social media accounts pretending to represent this portal.
           </p>
 
           <h2 className="text-base font-black text-slate-900 uppercase tracking-wide border-b border-slate-100 pb-1">
-            3. No Monetary Fees
+            4. Logos, Trademarks & Department Names
           </h2>
           <p>
-            All India Sarkari NEVER collects recruitment application fees, interview charges, or job placement fees from readers. Beware of fraudulent emails or phone calls claiming employment on behalf of this site.
+            All organization names, logos, emblems, and trademarks referenced on All India Sarkari remain the exclusive intellectual property of their respective government ministries, state departments, and recruitment commissions. Their use on this website is strictly descriptive for referential and identification purposes under nominative fair use.
           </p>
+
+          <h2 className="text-base font-black text-slate-900 uppercase tracking-wide border-b border-slate-100 pb-1">
+            5. External Links
+          </h2>
+          <p>
+            Links provided on our portal redirect directly to official departmental servers. We are not responsible for the availability, server uptime, or privacy policies of those external websites.
+          </p>
+
+          <div className="border-t border-slate-200 pt-4 text-xs text-slate-500">
+            For corrections, questions, or reporting discrepancies, please visit our <Link to="/contact" className="text-blue-800 font-bold underline">Contact Page</Link> or review our <Link to="/editorial-policy" className="text-blue-800 font-bold underline">Editorial & Content Policy</Link>.
+          </div>
         </main>
 
         <div className="lg:col-span-4">
@@ -63,3 +89,4 @@ export const DisclaimerPage: React.FC = () => {
     </div>
   );
 };
+

@@ -12,6 +12,7 @@ import {
   CATEGORIES_CONFIG,
   ALL_INDIAN_STATES,
   slugToCategory,
+  categoryToSlug,
   stateToSlug,
 } from '../data/statesAndCategories';
 import { Filter, MapPin } from 'lucide-react';
@@ -38,10 +39,30 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ forcedCategory }) =>
   useEffect(() => {
     if (!categoryName) return;
 
+    const catSlug = categorySlug || categoryToSlug(categoryName);
+
     updateSEO({
       title: `${categoryName} 2026 - Latest Govt Notifications`,
       description: categoryConfig?.description || `Find latest ${categoryName} updates across India.`,
-      canonicalUrl: categorySlug ? `/${categorySlug}` : '/',
+      canonicalUrl: `/${catSlug}`,
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: 'https://allindiasarkari.com/',
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: categoryName,
+            item: `https://allindiasarkari.com/${catSlug}`,
+          },
+        ],
+      },
     });
 
     setLoading(true);
