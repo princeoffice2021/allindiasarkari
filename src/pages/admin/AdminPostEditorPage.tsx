@@ -7,7 +7,6 @@ import { CATEGORIES_CONFIG, ALL_STATES_AND_UTS } from '../../data/statesAndCateg
 import { useToast } from '../../components/AdminToast';
 import { RichTextEditor } from '../../components/RichTextEditor';
 import { ArticleStructureBuilder } from '../../components/ArticleStructureBuilder';
-import { AIAssistantPanel } from '../../components/AIAssistantPanel';
 import { SEOContentQualityAudit } from '../../components/SEOContentQualityAudit';
 import { LiveArticlePreviewModal } from '../../components/LiveArticlePreviewModal';
 import {
@@ -338,56 +337,6 @@ export const AdminPostEditorPage: React.FC = () => {
           <span>{errorMsg}</span>
         </div>
       )}
-
-      {/* AI Article Assistant Panel (Gemini 3.7 Flash) */}
-      <AIAssistantPanel
-        currentTitle={formData.title}
-        currentContent={formData.content}
-        currentCategory={formData.category}
-        currentState={formData.state}
-        onApplyTitleAndMeta={(meta) => {
-          setFormData((prev) => ({
-            ...prev,
-            title: meta.title !== undefined ? meta.title : prev.title,
-            slug: meta.slug !== undefined ? meta.slug : prev.slug,
-            excerpt: meta.excerpt !== undefined ? meta.excerpt : prev.excerpt,
-            meta_description:
-              meta.metaDescription !== undefined ? meta.metaDescription : prev.meta_description,
-            keywords: meta.keywords !== undefined ? meta.keywords : prev.keywords,
-            official_source_url:
-              meta.officialSourceUrl !== undefined ? meta.officialSourceUrl : prev.official_source_url,
-          }));
-          if (meta.slug) {
-            setAutoSlug(false);
-          }
-          showToast('SEO title and metadata applied!', 'success');
-        }}
-        onApplyContent={(htmlContent, mode) => {
-          setFormData((prev) => ({
-            ...prev,
-            content:
-              mode === 'replace'
-                ? htmlContent
-                : prev.content
-                ? `${prev.content}\n${htmlContent}`
-                : htmlContent,
-          }));
-          showToast(
-            mode === 'replace'
-              ? 'Draft loaded into editor!'
-              : 'Appended content to editor!',
-            'success'
-          );
-        }}
-        onApplyFaqs={(newFaqs) => {
-          setFaqs(newFaqs);
-          showToast('FAQs loaded into FAQ builder!', 'success');
-        }}
-        onApplyLinks={(newLinks) => {
-          setImportantLinks(newLinks);
-          showToast('Links loaded into Important Links builder!', 'success');
-        }}
-      />
 
       {/* Main Form Layout */}
       <form onSubmit={(e) => handleSubmit(e)} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
