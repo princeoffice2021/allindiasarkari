@@ -2,7 +2,7 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/((?!robots\\.txt|sitemap\\.xml|assets/|.*\\..*).*)",
+      "source": "/((?!api/|robots\\.txt|sitemap\\.xml|assets/|.*\\..*).*)",
       "destination": "/index.html"
     }
   ]
