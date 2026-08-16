@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ALL_STATES_AND_UTS } from '../../data/statesAndCategories';
+import { ALL_STATES_AND_UTS, stateToSlug } from '../../data/statesAndCategories';
 import { getAllPostsAdmin } from '../../lib/postsService';
 import { updateSEO } from '../../lib/seo';
 import { useToast } from '../../components/AdminToast';
@@ -36,7 +36,7 @@ export const AdminStatesPage: React.FC = () => {
 
     const items: StateItem[] = ALL_STATES_AND_UTS.map((st) => ({
       name: st,
-      slug: st.toLowerCase().replace(/\s+/g, '-'),
+      slug: stateToSlug(st),
       active: true,
       postCount: counts[st] || 0,
     }));

@@ -104,7 +104,7 @@ function MainLayout() {
             {/* Public Core Routes */}
             <Route path="/" element={<HomePage />} />
             <Route path="/sarkari-yojana" element={<CategoryPage forcedCategory="Sarkari Yojana" />} />
-            <Route path="/sarkari-naukri" element={<CategoryPage forcedCategory="Sarkari Naukri" />} />
+            <Route path="/sarkari-naukri" element={<StatesPage />} />
             <Route path="/sarkari-naukri/:stateSlug" element={<StatePage />} />
             <Route path="/state/:stateSlug" element={<StatePage />} />
             <Route path="/jobs/:stateSlug" element={<StatePage />} />

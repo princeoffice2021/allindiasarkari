@@ -25,6 +25,14 @@ import {
   HelpCircle,
   ExternalLink,
 } from 'lucide-react';
+import { sanitizeArticleHtml } from '../lib/sanitizer';
+import {
+  containsTableMarkup,
+  isTabularText,
+  convertTabularTextToHtmlTable,
+  escapeHtml,
+  cleanAndRepairTable,
+} from '../lib/tableUtils';
 
 interface RichTextEditorProps {
   value: string;
@@ -44,10 +52,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [linkUrl, setLinkUrl] = useState('');
   const [linkText, setLinkText] = useState('');
   const [showTableMenu, setShowTableMenu] = useState(false);
-  const [selectedTableCoords, setSelectedTableCoords] = useState<{ rows: number; cols: number }>({
-    rows: 3,
-    cols: 2,
-  });
 
   const isUpdatingFromProp = useRef(false);
 
@@ -133,6 +137,74 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     execCmd('unlink');
   };
 
+  // Helper to insert HTML at cursor position safely
+  const insertHtmlAtCursor = (html: string) => {
+    if (isSourceMode) return;
+
+    if (editorRef.current) {
+      editorRef.current.focus();
+    }
+
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) {
+      if (editorRef.current) {
+        editorRef.current.innerHTML += html;
+      }
+      return;
+    }
+
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+
+    const frag = document.createDocumentFragment();
+    let node: Node | null;
+    let lastNode: Node | null = null;
+    while ((node = tempDiv.firstChild)) {
+      lastNode = frag.appendChild(node);
+    }
+
+    range.insertNode(frag);
+    if (lastNode) {
+      range.setStartAfter(lastNode);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  };
+
+  // Robust Paste Handler
+  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    e.preventDefault();
+
+    const clipboardData = e.clipboardData;
+    const pastedHtml = clipboardData.getData('text/html');
+    const pastedText = clipboardData.getData('text/plain');
+
+    let processedHtml = '';
+
+    if (pastedHtml && containsTableMarkup(pastedHtml)) {
+      // 1. Full HTML with table(s): sanitize and preserve all rows, cols, spans & empty cells
+      processedHtml = sanitizeArticleHtml(pastedHtml);
+    } else if (pastedText && isTabularText(pastedText)) {
+      // 2. Tabular text (TSV / Markdown table): convert to complete equal-column HTML table
+      processedHtml = convertTabularTextToHtmlTable(pastedText);
+    } else if (pastedHtml) {
+      // 3. Rich text without tables: sanitize safely
+      processedHtml = sanitizeArticleHtml(pastedHtml);
+    } else if (pastedText) {
+      // 4. Plain text: preserve line breaks
+      processedHtml = escapeHtml(pastedText).replace(/\r?\n/g, '<br>');
+    }
+
+    if (processedHtml) {
+      insertHtmlAtCursor(processedHtml);
+      handleInput();
+    }
+  };
+
   // Table operations
   const insertTable = (rows: number, cols: number) => {
     if (isSourceMode) return;
@@ -142,16 +214,16 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
     let headerCells = '';
     for (let c = 1; c <= cols; c++) {
-      headerCells += `<th>Heading ${c}</th>`;
+      headerCells += `<th class="p-3 bg-blue-900 text-white font-bold border border-blue-800 text-left">Heading ${c}</th>`;
     }
 
     let bodyRows = '';
     for (let r = 1; r <= rows; r++) {
       let cells = '';
       for (let c = 1; c <= cols; c++) {
-        cells += `<td>Sample Data ${r}.${c}</td>`;
+        cells += `<td class="p-3 border border-slate-200 text-slate-800">Sample Data ${r}.${c}</td>`;
       }
-      bodyRows += `<tr>${cells}</tr>`;
+      bodyRows += `<tr class="${r % 2 === 1 ? 'bg-slate-50' : 'bg-white'} border-b border-slate-200">${cells}</tr>`;
     }
 
     const tableHtml = `
@@ -165,7 +237,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 </div>
 <p><br></p>`;
 
-    document.execCommand('insertHTML', false, tableHtml);
+    insertHtmlAtCursor(tableHtml);
     handleInput();
     setShowTableMenu(false);
   };
@@ -191,10 +263,19 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       return;
     }
 
-    const colsCount = tr ? tr.cells.length : (table.rows[0]?.cells.length || 2);
+    // Determine logical column count
+    let colsCount = 2;
+    if (tr) {
+      colsCount = tr.cells.length;
+    } else if (table.rows.length > 0) {
+      colsCount = table.rows[0].cells.length;
+    }
+
     const newRow = document.createElement('tr');
+    newRow.className = 'border-b border-slate-200 bg-white';
     for (let i = 0; i < colsCount; i++) {
       const td = document.createElement('td');
+      td.className = 'p-3 border border-slate-200 text-slate-800';
       td.innerHTML = 'New cell';
       newRow.appendChild(td);
     }
@@ -205,6 +286,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const tbody = table.querySelector('tbody') || table;
       tbody.appendChild(newRow);
     }
+
+    cleanAndRepairTable(table);
     handleInput();
   };
 
@@ -212,8 +295,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     const sel = window.getSelection();
     if (!sel || !sel.anchorNode) return;
     const tr = findParentTag(sel.anchorNode, 'tr');
+    const table = findParentTag(sel.anchorNode, 'table');
     if (tr && tr.parentNode) {
       tr.parentNode.removeChild(tr);
+      if (table) {
+        cleanAndRepairTable(table as HTMLTableElement);
+      }
       handleInput();
     } else {
       alert('Please place your cursor inside a table row to delete.');
@@ -235,6 +322,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const tr = thead.querySelector('tr');
       if (tr) {
         const th = document.createElement('th');
+        th.className = 'p-3 bg-blue-900 text-white font-bold border border-blue-800 text-left';
         th.innerHTML = 'New Header';
         tr.appendChild(th);
       }
@@ -244,18 +332,20 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     const tbody = table.querySelector('tbody') || table;
     const rows = tbody.querySelectorAll('tr');
     rows.forEach((r, idx) => {
-      // If no thead, first row might be headers
       if (!thead && idx === 0) {
         const th = document.createElement('th');
+        th.className = 'p-3 bg-blue-900 text-white font-bold border border-blue-800 text-left';
         th.innerHTML = 'New Header';
         r.appendChild(th);
       } else {
         const td = document.createElement('td');
+        td.className = 'p-3 border border-slate-200 text-slate-800';
         td.innerHTML = 'New cell';
         r.appendChild(td);
       }
     });
 
+    cleanAndRepairTable(table);
     handleInput();
   };
 
@@ -276,16 +366,19 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         r.deleteCell(colIndex);
       }
     });
+
+    cleanAndRepairTable(table);
     handleInput();
   };
 
   const handleToggleSource = () => {
     if (isSourceMode) {
-      // Switching from code to visual
+      // Switching from code to visual - sanitize & repair any tables
+      const cleaned = sanitizeArticleHtml(sourceCode);
       if (editorRef.current) {
-        editorRef.current.innerHTML = sourceCode;
+        editorRef.current.innerHTML = cleaned;
       }
-      onChange(sourceCode);
+      onChange(cleaned);
       setIsSourceMode(false);
     } else {
       // Switching from visual to code
@@ -472,10 +565,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => insertTable(6, 2)}
+                  onClick={() => insertTable(8, 6)}
                   className="rounded-lg border border-slate-200 bg-slate-50 p-2 text-left hover:bg-blue-50 hover:border-blue-300 font-semibold"
                 >
-                  2 Columns × 6 Rows
+                  6 Columns × 8 Rows
                 </button>
               </div>
 
@@ -575,7 +668,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             value={sourceCode}
             onChange={(e) => handleSourceChange(e.target.value)}
             rows={18}
-            className="w-full h-full min-h-[380px] p-4 text-xs font-mono text-slate-800 bg-slate-900 text-emerald-300 focus:outline-hidden leading-relaxed"
+            className="w-full h-full min-h-[380px] p-4 text-xs font-mono text-emerald-300 bg-slate-900 focus:outline-hidden leading-relaxed"
             placeholder="Edit raw HTML content here..."
           />
         ) : (
@@ -584,6 +677,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             contentEditable
             onInput={handleInput}
             onBlur={handleInput}
+            onPaste={handlePaste}
             className="article-content p-5 sm:p-6 min-h-[380px] focus:outline-hidden text-slate-800 text-sm leading-relaxed"
             style={{ minHeight: '380px' }}
           />

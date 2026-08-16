@@ -53,8 +53,8 @@ export const StatePage: React.FC = () => {
           {
             '@type': 'ListItem',
             position: 2,
-            name: 'State Jobs',
-            item: 'https://allindiasarkari.com/states',
+            name: 'Sarkari Naukri By State',
+            item: 'https://allindiasarkari.com/sarkari-naukri',
           },
           {
             '@type': 'ListItem',
@@ -169,6 +169,15 @@ export const StatePage: React.FC = () => {
                     <ChevronRight className="h-3 w-3 text-slate-400" />
                   </Link>
                 ))}
+            </div>
+            <div className="pt-2 border-t border-slate-100 text-center">
+              <Link
+                to="/sarkari-naukri"
+                className="text-xs font-bold text-blue-800 hover:underline inline-flex items-center gap-1"
+              >
+                <span>View Complete State & UT Directory</span>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
           </div>
         </main>

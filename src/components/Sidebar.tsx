@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SearchBar } from './SearchBar';
 import { AdSlot } from './AdSlot';
-import { ALL_INDIAN_STATES, CATEGORIES_CONFIG, stateToSlug } from '../data/statesAndCategories';
+import { ALL_INDIAN_STATES, ALL_STATES_AND_UTS, CATEGORIES_CONFIG, stateToSlug } from '../data/statesAndCategories';
 import { getLatestPosts } from '../lib/postsService';
 import { Post } from '../types';
 import { MapPin, Sparkles, TrendingUp, ChevronRight } from 'lucide-react';
@@ -55,7 +55,7 @@ export const Sidebar: React.FC = () => {
           to="/sarkari-naukri"
           className="mt-3 block text-center text-xs font-bold text-blue-800 hover:underline"
         >
-          View All 28 States & UTs Jobs →
+          View All {ALL_STATES_AND_UTS.length} States & UTs Jobs →
         </Link>
       </div>
 

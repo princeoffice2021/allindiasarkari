@@ -10,6 +10,7 @@ import { CategoryBadge } from '../components/CategoryBadge';
 import {
   ALL_INDIAN_STATES,
   ALL_UNION_TERRITORIES,
+  ALL_STATES_AND_UTS,
   CATEGORIES_CONFIG,
   stateToSlug,
 } from '../data/statesAndCategories';
@@ -337,12 +338,21 @@ export const HomePage: React.FC = () => {
 
           {/* ALL 28 STATES & UTs QUICK GRID */}
           <section className="rounded-xl border border-slate-200 bg-slate-900 text-white p-6 shadow-md space-y-4">
-            <div className="border-b border-slate-800 pb-3">
-              <h2 className="text-lg font-black uppercase tracking-wide text-white flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-amber-400" />
-                Sarkari Jobs By All Indian States & UTs
-              </h2>
-              <p className="text-xs text-slate-400">Direct state-wise recruitment portals and job notifications</p>
+            <div className="border-b border-slate-800 pb-3 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 className="text-lg font-black uppercase tracking-wide text-white flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-amber-400" />
+                  Sarkari Jobs By All Indian States & UTs
+                </h2>
+                <p className="text-xs text-slate-400">Direct state-wise recruitment portals and job notifications</p>
+              </div>
+              <Link
+                to="/sarkari-naukri"
+                className="text-xs font-bold text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1"
+              >
+                <span>View All {ALL_STATES_AND_UTS.length} States & UTs Directory</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs">

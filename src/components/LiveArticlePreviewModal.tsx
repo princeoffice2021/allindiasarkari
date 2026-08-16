@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import DOMPurify from 'dompurify';
+import { sanitizeArticleHtml } from '../lib/sanitizer';
 import { CategoryBadge } from './CategoryBadge';
 import {
   Calendar,
@@ -66,7 +66,7 @@ export const LiveArticlePreviewModal: React.FC<LiveArticlePreviewModalProps> = (
     year: 'numeric',
   });
 
-  const sanitizedContent = DOMPurify.sanitize(content || '');
+  const sanitizedContent = sanitizeArticleHtml(content || '');
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-2 sm:p-4 backdrop-blur-xs">

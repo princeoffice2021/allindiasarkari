@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllPostsAdmin } from '../lib/postsService';
 import { Post } from '../types';
-import { CATEGORIES_CONFIG, ALL_INDIAN_STATES, ALL_UNION_TERRITORIES, stateToSlug } from '../data/statesAndCategories';
+import { CATEGORIES_CONFIG, ALL_INDIAN_STATES, ALL_UNION_TERRITORIES, ALL_STATES_AND_UTS, stateToSlug } from '../data/statesAndCategories';
 import { BASE_URL, updateSEO } from '../lib/seo';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { FileCode, Globe, Check, BookOpen, MapPin, ShieldCheck, FileText } from 'lucide-react';
@@ -63,8 +63,13 @@ export const SitemapPage: React.FC = () => {
   </url>`
   ).join('')}
 
-  <!-- States Sarkari Naukri -->
-  ${ALL_INDIAN_STATES.map(
+  <!-- States & UTs Sarkari Naukri Directory -->
+  <url>
+    <loc>${baseUrl}/sarkari-naukri</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  ${ALL_STATES_AND_UTS.map(
     (st) => `
   <url>
     <loc>${baseUrl}/sarkari-naukri/${stateToSlug(st)}</loc>

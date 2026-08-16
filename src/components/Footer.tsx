@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Flag, ShieldAlert, Award, FileText, CheckCircle2 } from 'lucide-react';
-import { CATEGORIES_CONFIG, ALL_INDIAN_STATES } from '../data/statesAndCategories';
+import { CATEGORIES_CONFIG, ALL_INDIAN_STATES, ALL_STATES_AND_UTS, stateToSlug } from '../data/statesAndCategories';
 
 export const Footer: React.FC = () => {
   return (
@@ -67,7 +67,7 @@ export const Footer: React.FC = () => {
           </h4>
           <div className="grid grid-cols-2 gap-x-2 gap-y-1.5 text-[11px]">
             {ALL_INDIAN_STATES.slice(0, 12).map((st) => {
-              const slug = st.toLowerCase().replace(/\s+/g, '-');
+              const slug = stateToSlug(st);
               return (
                 <Link
                   key={st}
@@ -83,7 +83,7 @@ export const Footer: React.FC = () => {
             to="/sarkari-naukri"
             className="inline-block text-amber-400 hover:underline font-bold pt-1"
           >
-            View All States & UTs Jobs →
+            View All {ALL_STATES_AND_UTS.length} States & UTs Jobs →
           </Link>
         </div>
 

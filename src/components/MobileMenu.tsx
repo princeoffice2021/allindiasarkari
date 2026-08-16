@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { X, ChevronRight, Building2, MapPin, ShieldCheck } from 'lucide-react';
-import { CATEGORIES_CONFIG, ALL_INDIAN_STATES } from '../data/statesAndCategories';
+import { CATEGORIES_CONFIG, ALL_INDIAN_STATES, ALL_STATES_AND_UTS, stateToSlug } from '../data/statesAndCategories';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -96,7 +96,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
             </div>
             <div className="grid grid-cols-2 gap-1.5 text-xs">
               {ALL_INDIAN_STATES.slice(0, 10).map((state) => {
-                const slug = state.toLowerCase().replace(/\s+/g, '-');
+                const slug = stateToSlug(state);
                 return (
                   <Link
                     key={state}
@@ -114,7 +114,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
               onClick={onClose}
               className="mt-2 block text-center text-xs font-bold text-blue-700 hover:underline"
             >
-              View All 28 States & UTs →
+              View All {ALL_STATES_AND_UTS.length} States & UTs Jobs →
             </Link>
           </div>
 

@@ -849,3 +849,15 @@ export async function uploadPostImage(file: File): Promise<string> {
   });
 }
 
+export async function getStatePostCounts(): Promise<Record<string, number>> {
+  const posts = await getLatestPosts(100);
+  const counts: Record<string, number> = {};
+  posts.forEach((p) => {
+    if (p.state && p.published) {
+      counts[p.state] = (counts[p.state] || 0) + 1;
+    }
+  });
+  return counts;
+}
+
+

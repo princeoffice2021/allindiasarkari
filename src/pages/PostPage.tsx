@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import DOMPurify from 'dompurify';
+import { sanitizeArticleHtml } from '../lib/sanitizer';
 import { Post } from '../types';
 import { getPostBySlug, getRelatedPosts } from '../lib/postsService';
 import { updateSEO } from '../lib/seo';
@@ -182,8 +182,8 @@ export const PostPage: React.FC = () => {
   const categorySlug = categoryToSlug(post.category);
   const stateSlug = post.state ? stateToSlug(post.state) : null;
 
-  // Sanitize HTML safely before rendering
-  const sanitizedContent = DOMPurify.sanitize(post.content);
+  // Sanitize HTML safely before rendering, ensuring all table columns and structures are preserved
+  const sanitizedContent = sanitizeArticleHtml(post.content);
 
   return (
     <div className="space-y-6 pb-12">
