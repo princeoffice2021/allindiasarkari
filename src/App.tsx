@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { AdminLayout } from './components/AdminLayout';
+import { initGA, trackPageView } from './lib/analytics';
 
 // Public Pages
 import { HomePage } from './pages/HomePage';
@@ -39,6 +40,35 @@ function ScrollToTop() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+  return null;
+}
+
+// Analytics Tracker: loads GA4 script once, tracks initial view and all SPA route transitions
+function AnalyticsTracker() {
+  const location = useLocation();
+  const lastTrackedPathRef = useRef<string>('');
+
+  useEffect(() => {
+    initGA();
+  }, []);
+
+  useEffect(() => {
+    const fullPath = `${location.pathname}${location.search}`;
+
+    // Prevent duplicate page_view events on rapid re-renders
+    if (lastTrackedPathRef.current === fullPath) {
+      return;
+    }
+    lastTrackedPathRef.current = fullPath;
+
+    // Small delay to allow updateSEO() in route components to set the accurate document.title
+    const timer = setTimeout(() => {
+      trackPageView(fullPath, document.title);
+    }, 80);
+
+    return () => clearTimeout(timer);
+  }, [location.pathname, location.search]);
+
   return null;
 }
 
@@ -133,6 +163,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <AnalyticsTracker />
       <MainLayout />
     </BrowserRouter>
   );
