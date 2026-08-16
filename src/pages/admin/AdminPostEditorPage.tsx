@@ -5,6 +5,10 @@ import { getPostByIdAdmin, createPost, updatePost, generateSlug, uploadPostImage
 import { updateSEO } from '../../lib/seo';
 import { CATEGORIES_CONFIG, ALL_STATES_AND_UTS } from '../../data/statesAndCategories';
 import { useToast } from '../../components/AdminToast';
+import { RichTextEditor } from '../../components/RichTextEditor';
+import { ArticleStructureBuilder } from '../../components/ArticleStructureBuilder';
+import { SEOContentQualityAudit } from '../../components/SEOContentQualityAudit';
+import { LiveArticlePreviewModal } from '../../components/LiveArticlePreviewModal';
 import {
   FileText,
   Save,
@@ -17,15 +21,11 @@ import {
   Trash2,
   ExternalLink,
   HelpCircle,
-  Table,
-  Calendar,
-  IndianRupee,
-  Briefcase,
-  CheckCircle2,
-  AlertCircle,
-  Info,
   Upload,
   Loader2,
+  AlertCircle,
+  CheckCircle2,
+  Sparkles,
 } from 'lucide-react';
 
 interface LinkItem {
@@ -102,6 +102,7 @@ export const AdminPostEditorPage: React.FC = () => {
   };
 
   const [autoSlug, setAutoSlug] = useState(true);
+  const [showLivePreview, setShowLivePreview] = useState(false);
 
   useEffect(() => {
     updateSEO({
@@ -291,12 +292,21 @@ export const AdminPostEditorPage: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowLivePreview(true)}
+            className="flex items-center gap-1.5 rounded-lg bg-blue-800 px-4 py-2 text-xs font-black uppercase text-amber-300 hover:bg-blue-700 shadow-md transition-colors"
+            title="Live Preview without saving"
+          >
+            <Sparkles className="h-4 w-4 text-amber-400" /> Live Article Preview
+          </button>
+
           {isEditing && id && (
             <Link
               to={`/admin/posts/${id}/preview`}
               className="flex items-center gap-1.5 rounded-lg bg-slate-800 px-4 py-2 text-xs font-bold text-slate-200 hover:bg-slate-700 hover:text-white transition-colors"
             >
-              <Eye className="h-4 w-4 text-amber-400" /> Preview Article
+              <Eye className="h-4 w-4 text-slate-400" /> Saved Page Preview
             </Link>
           )}
 
@@ -400,60 +410,46 @@ export const AdminPostEditorPage: React.FC = () => {
               />
             </div>
 
-            {/* Quick Template Toolbar */}
-            <div className="rounded-xl bg-slate-50 border border-slate-200 p-3 space-y-2">
-              <span className="text-[11px] font-black uppercase text-slate-700 tracking-wider block">
-                ⚡ Quick Insert Sarkari Government Templates:
-              </span>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => insertTemplateSnippet('overview')}
-                  className="inline-flex items-center gap-1 rounded-md bg-white border border-slate-300 px-2.5 py-1 text-[11px] font-bold text-slate-800 hover:bg-slate-100 shadow-2xs"
-                >
-                  <Table className="h-3 w-3 text-blue-800" /> + Overview Table
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertTemplateSnippet('dates')}
-                  className="inline-flex items-center gap-1 rounded-md bg-white border border-slate-300 px-2.5 py-1 text-[11px] font-bold text-slate-800 hover:bg-slate-100 shadow-2xs"
-                >
-                  <Calendar className="h-3 w-3 text-emerald-700" /> + Important Dates
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertTemplateSnippet('fee')}
-                  className="inline-flex items-center gap-1 rounded-md bg-white border border-slate-300 px-2.5 py-1 text-[11px] font-bold text-slate-800 hover:bg-slate-100 shadow-2xs"
-                >
-                  <IndianRupee className="h-3 w-3 text-amber-600" /> + Application Fee
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertTemplateSnippet('eligibility')}
-                  className="inline-flex items-center gap-1 rounded-md bg-white border border-slate-300 px-2.5 py-1 text-[11px] font-bold text-slate-800 hover:bg-slate-100 shadow-2xs"
-                >
-                  <Briefcase className="h-3 w-3 text-purple-700" /> + Eligibility
-                </button>
-              </div>
-            </div>
+            {/* Article Structure Assistant & Templates */}
+            <ArticleStructureBuilder
+              onInsertStructure={(htmlToInsert, mode) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  content:
+                    mode === 'replace'
+                      ? htmlToInsert
+                      : prev.content
+                      ? `${prev.content}\n${htmlToInsert}`
+                      : htmlToInsert,
+                }));
+                showToast('Article structure template inserted!', 'info');
+              }}
+            />
 
-            {/* HTML Article Content Body */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                  Full Article HTML Content <span className="text-red-600">*</span>
+            {/* Visual WYSIWYG Rich Text Article Editor */}
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <label className="block text-xs font-black uppercase tracking-wider text-slate-800">
+                  Full Article Content (Visual Rich Text Editor) <span className="text-red-600">*</span>
                 </label>
-                <span className="text-[11px] font-bold text-slate-500">
-                  {formData.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length} words
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">
+                    {formData.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length} words
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowLivePreview(true)}
+                    className="inline-flex items-center gap-1 text-xs font-extrabold text-blue-800 hover:text-blue-950 underline"
+                  >
+                    <Eye className="h-3.5 w-3.5" /> Preview Look
+                  </button>
+                </div>
               </div>
-              <textarea
-                required
-                rows={16}
+
+              <RichTextEditor
                 value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                placeholder="<h2>Notification Details</h2><p>Write detailed post content here...</p>"
-                className="w-full rounded-lg border border-slate-300 p-3 text-sm font-mono text-slate-800 focus:border-blue-800 focus:outline-hidden leading-relaxed"
+                onChange={(html) => setFormData((prev) => ({ ...prev, content: html }))}
+                placeholder="Start typing your structured article or click any template block above..."
               />
             </div>
           </div>
@@ -749,40 +745,42 @@ export const AdminPostEditorPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Quality Audit Summary Card */}
-          <div className="bg-slate-900 text-white rounded-2xl p-5 shadow-xs space-y-3">
-            <h3 className="text-xs font-black uppercase tracking-wider text-amber-400 border-b border-slate-800 pb-2 flex items-center gap-1.5">
-              <CheckCircle2 className="h-4 w-4 text-amber-400" /> SEO Content Quality Audit
-            </h3>
-            <ul className="text-xs space-y-2 text-slate-300">
-              <li className="flex items-center justify-between">
-                <span>Title Length (30-80 chars)</span>
-                <span className={formData.title.length >= 30 && formData.title.length <= 80 ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
-                  {formData.title.length >= 30 && formData.title.length <= 80 ? '✓ Good' : '⚠️ Review'}
-                </span>
-              </li>
-              <li className="flex items-center justify-between">
-                <span>Meta Description</span>
-                <span className={formData.meta_description.length >= 50 ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
-                  {formData.meta_description.length >= 50 ? '✓ Added' : '⚠️ Short'}
-                </span>
-              </li>
-              <li className="flex items-center justify-between">
-                <span>Featured Image</span>
-                <span className={formData.image_url ? 'text-emerald-400 font-bold' : 'text-slate-400'}>
-                  {formData.image_url ? '✓ Set' : 'Optional'}
-                </span>
-              </li>
-              <li className="flex items-center justify-between">
-                <span>Article Words</span>
-                <span className={formData.content.length > 200 ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
-                  {formData.content.length > 200 ? '✓ Detailed' : '⚠️ Brief'}
-                </span>
-              </li>
-            </ul>
-          </div>
+          {/* Quality Audit Summary Panel */}
+          <SEOContentQualityAudit
+            title={formData.title}
+            metaDescription={formData.meta_description}
+            slug={formData.slug}
+            content={formData.content}
+            imageUrl={formData.image_url}
+            officialSourceUrl={formData.official_source_url}
+            importantLinksCount={importantLinks.length}
+            faqsCount={faqs.length}
+          />
         </div>
       </form>
+
+      {/* Live Article Preview Modal (Simulates Exact Public Post View) */}
+      <LiveArticlePreviewModal
+        isOpen={showLivePreview}
+        onClose={() => setShowLivePreview(false)}
+        title={formData.title}
+        category={formData.category}
+        state={formData.state}
+        excerpt={formData.excerpt}
+        content={formData.content}
+        imageUrl={formData.image_url}
+        officialSourceUrl={formData.official_source_url}
+        importantLinks={importantLinks}
+        faqs={faqs}
+        keywords={
+          formData.keywords
+            ? formData.keywords
+                .split(',')
+                .map((k) => k.trim())
+                .filter(Boolean)
+            : []
+        }
+      />
     </div>
   );
 };
