@@ -186,8 +186,7 @@ export const HomePage: React.FC = () => {
                           rel="noopener noreferrer"
                           className="flex items-center justify-center gap-2 w-full rounded-lg bg-blue-900 px-4 py-3 text-sm font-bold text-white shadow-xs hover:bg-blue-950 transition-all border border-blue-800 hover:shadow-md"
                         >
-                          <span>View All Latest Updates</span>
-                          <ArrowRight className="h-4 w-4" />
+                          <span>View All Latest Updates →</span>
                         </a>
                       </div>
                     </div>
