@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   ShieldCheck,
+  Bot,
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -41,9 +42,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     }
   };
 
-
   const menuItems = [
     { label: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+    { label: 'AI Sarkari Staff', path: '/admin/ai-staff', icon: Bot, isAi: true },
     { label: 'Manage Posts', path: '/admin/posts', icon: FileText },
     { label: 'Add New Post', path: '/admin/posts/new', icon: PlusCircle },
     { label: 'Categories', path: '/admin/categories', icon: FolderTree },
@@ -91,7 +92,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 }`}
               >
                 <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-amber-400' : 'text-slate-400'}`} />
-                <span>{item.label}</span>
+                <span className="flex-1">{item.label}</span>
+                {item.isAi && (
+                  <span className="rounded bg-amber-400/20 text-amber-300 px-1.5 py-0.2 text-[9px] font-black tracking-wider border border-amber-400/30">
+                    AI
+                  </span>
+                )}
               </Link>
             );
           })}

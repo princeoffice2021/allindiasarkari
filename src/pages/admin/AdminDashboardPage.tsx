@@ -21,12 +21,15 @@ import {
   MapPin,
   Image as ImageIcon,
   Settings,
+  Bot,
 } from 'lucide-react';
+import { getAIStaffDrafts } from '../../lib/aiStaffService';
 
 export const AdminDashboardPage: React.FC = () => {
   const [stats, setStats] = useState<PostStats | null>(null);
   const [recentPosts, setRecentPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [aiPendingCount, setAiPendingCount] = useState(0);
   const navigate = useNavigate();
   const { showToast } = useToast();
 
@@ -51,6 +54,9 @@ export const AdminDashboardPage: React.FC = () => {
     setLoading(true);
     const s = await getPostStats();
     const posts = await getAllPostsAdmin();
+    const aiDrafts = getAIStaffDrafts();
+    const pending = aiDrafts.filter(d => d.status === 'PENDING_REVIEW' || d.status === 'EDITED').length;
+    setAiPendingCount(pending);
     setStats(s);
     setRecentPosts(posts.slice(0, 8));
     setLoading(false);
@@ -135,7 +141,27 @@ export const AdminDashboardPage: React.FC = () => {
       )}
 
       {/* Quick Access Portal Modules */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <Link
+          to="/admin/ai-staff"
+          className="rounded-2xl border-2 border-amber-400/80 bg-amber-50/50 p-4 shadow-2xs hover:border-amber-500 hover:bg-amber-50 transition-all flex items-center gap-3 relative group"
+        >
+          <div className="p-3 rounded-xl bg-blue-900 text-amber-400 shrink-0 shadow-inner">
+            <Bot className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <h3 className="text-xs font-black uppercase text-slate-900 truncate">AI Sarkari Staff</h3>
+              {aiPendingCount > 0 && (
+                <span className="rounded-full bg-amber-500 text-slate-950 px-1.5 py-0.2 text-[9px] font-black shrink-0">
+                  {aiPendingCount} New
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-slate-600 truncate">Scans & Drafts Queue</p>
+          </div>
+        </Link>
+
         <Link
           to="/admin/posts"
           className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs hover:border-blue-700 transition-all flex items-center gap-3"

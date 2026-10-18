@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { X, ChevronRight, Building2, MapPin, ShieldCheck } from 'lucide-react';
+import { X, ChevronRight, Building2, MapPin } from 'lucide-react';
 import { CATEGORIES_CONFIG, ALL_INDIAN_STATES, ALL_STATES_AND_UTS, stateToSlug } from '../data/statesAndCategories';
 
 interface MobileMenuProps {
@@ -118,18 +118,9 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
             </Link>
           </div>
 
-          {/* Admin & Legal */}
+          {/* Legal Links */}
           <div className="border-t border-slate-200 pt-4 space-y-2">
-            <Link
-              to="/admin/login"
-              onClick={onClose}
-              className="flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white shadow-xs hover:bg-slate-800 justify-center"
-            >
-              <ShieldCheck className="h-4 w-4 text-emerald-400" />
-              <span>Admin Portal Login</span>
-            </Link>
-
-            <div className="flex flex-wrap justify-between gap-2 pt-2 text-[11px] text-slate-500 font-medium">
+            <div className="flex flex-wrap justify-between gap-2 text-[11px] text-slate-500 font-medium">
               <Link to="/about" onClick={onClose} className="hover:underline">About</Link>
               <Link to="/contact" onClick={onClose} className="hover:underline">Contact</Link>
               <Link to="/editorial-policy" onClick={onClose} className="hover:underline">Editorial</Link>

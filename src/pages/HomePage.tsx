@@ -73,7 +73,7 @@ export const HomePage: React.FC = () => {
 
     async function loadData() {
       setLoading(true);
-      const latest = await getLatestPosts(6);
+      const latest = await getLatestPosts(20);
       setLatestPosts(latest);
 
       // Fetch sample posts for key category sections
@@ -156,11 +156,45 @@ export const HomePage: React.FC = () => {
               <span className="text-xs font-bold text-slate-500">Updated Hourly</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {latestPosts.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </div>
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="h-64 rounded-xl bg-slate-200 animate-pulse" />
+                ))}
+              </div>
+            ) : latestPosts.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-slate-500 bg-white">
+                <p className="text-sm font-semibold text-slate-700">No published updates available at the moment.</p>
+                <p className="text-xs text-slate-500 mt-1">Please check back soon for latest notifications.</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {Array.from({ length: Math.ceil(latestPosts.length / 4) }, (_, groupIdx) => {
+                  const chunk = latestPosts.slice(groupIdx * 4, groupIdx * 4 + 4);
+                  return (
+                    <div key={`post-group-${groupIdx}`} className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {chunk.map((post) => (
+                          <PostCard key={post.id} post={post} />
+                        ))}
+                      </div>
+
+                      <div className="pt-1">
+                        <a
+                          href="/latest-updates"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 w-full rounded-lg bg-blue-900 px-4 py-3 text-sm font-bold text-white shadow-xs hover:bg-blue-950 transition-all border border-blue-800 hover:shadow-md"
+                        >
+                          <span>View All Latest Updates</span>
+                          <ArrowRight className="h-4 w-4" />
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </section>
 
           {/* Ad Slot - Between Sections */}

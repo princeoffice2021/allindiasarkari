@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, Search, X, Flag, Sparkles, UserCheck } from 'lucide-react';
+import { Menu, Search, Flag } from 'lucide-react';
 import { CATEGORIES_CONFIG } from '../data/statesAndCategories';
 import { SearchBar } from './SearchBar';
 import { MobileMenu } from './MobileMenu';
@@ -28,9 +28,6 @@ export const Header: React.FC = () => {
           <div className="hidden md:flex items-center gap-4 text-slate-300 text-[11px]">
             <Link to="/about" className="hover:text-white transition-colors">About Us</Link>
             <Link to="/contact" className="hover:text-white transition-colors">Contact</Link>
-            <Link to="/admin/login" className="flex items-center gap-1 text-emerald-400 font-bold hover:text-emerald-300 transition-colors">
-              <UserCheck className="h-3 w-3" /> Admin Portal
-            </Link>
           </div>
         </div>
       </div>

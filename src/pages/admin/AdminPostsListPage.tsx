@@ -173,14 +173,25 @@ export const AdminPostsListPage: React.FC = () => {
                 filteredPosts.map((post) => (
                   <tr key={post.id} className="hover:bg-slate-50">
                     <td className="p-3.5 font-bold text-slate-900 max-w-sm">
-                      <Link
-                        to={`/post/${post.slug}`}
-                        target="_blank"
-                        className="hover:text-blue-800 line-clamp-1"
-                        title={post.title}
-                      >
-                        {post.title}
-                      </Link>
+                      <div className="flex items-center gap-1.5">
+                        {post.source_type === 'ai_staff' ? (
+                          <span className="rounded bg-amber-100 text-amber-900 px-1.5 py-0.2 text-[9px] font-black tracking-wider uppercase border border-amber-300 shrink-0">
+                            AI Staff
+                          </span>
+                        ) : (
+                          <span className="rounded bg-slate-100 text-slate-600 px-1.5 py-0.2 text-[9px] font-bold tracking-wider uppercase border border-slate-200 shrink-0">
+                            Manual
+                          </span>
+                        )}
+                        <Link
+                          to={`/post/${post.slug}`}
+                          target="_blank"
+                          className="hover:text-blue-800 line-clamp-1 truncate"
+                          title={post.title}
+                        >
+                          {post.title}
+                        </Link>
+                      </div>
                     </td>
                     <td className="p-3.5">
                       <span className="font-semibold text-blue-900 bg-blue-50 px-2 py-0.5 rounded">

@@ -8,6 +8,7 @@ import { initGA, trackPageView } from './lib/analytics';
 
 // Public Pages
 import { HomePage } from './pages/HomePage';
+import { LatestUpdatesPage } from './pages/LatestUpdatesPage';
 import { CategoryPage } from './pages/CategoryPage';
 import { StatePage } from './pages/StatePage';
 import { StatesPage } from './pages/StatesPage';
@@ -33,6 +34,7 @@ import { AdminStatesPage } from './pages/admin/AdminStatesPage';
 import { AdminMediaPage } from './pages/admin/AdminMediaPage';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
 import { AdminPostPreviewPage } from './pages/admin/AdminPostPreviewPage';
+import { AIStaffDashboardPage } from './pages/admin/ai-staff/AIStaffDashboardPage';
 
 // Scroll To Top component on route navigation
 function ScrollToTop() {
@@ -82,6 +84,8 @@ function MainLayout() {
       <AdminLayout>
         <Routes>
           <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/admin/ai-staff" element={<AIStaffDashboardPage />} />
+          <Route path="/admin/ai-staff/*" element={<AIStaffDashboardPage />} />
           <Route path="/admin/posts" element={<AdminPostsListPage />} />
           <Route path="/admin/posts/new" element={<AdminPostEditorPage />} />
           <Route path="/admin/posts/:id/edit" element={<AdminPostEditorPage />} />
@@ -103,6 +107,7 @@ function MainLayout() {
           <Routes>
             {/* Public Core Routes */}
             <Route path="/" element={<HomePage />} />
+            <Route path="/latest-updates" element={<LatestUpdatesPage />} />
             <Route path="/sarkari-yojana" element={<CategoryPage forcedCategory="Sarkari Yojana" />} />
             <Route path="/sarkari-naukri" element={<StatesPage />} />
             <Route path="/sarkari-naukri/:stateSlug" element={<StatePage />} />

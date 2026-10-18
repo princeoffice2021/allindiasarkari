@@ -128,11 +128,6 @@ export const Footer: React.FC = () => {
                 HTML / XML Sitemap
               </Link>
             </li>
-            <li>
-              <Link to="/admin/login" className="text-emerald-400 font-bold hover:underline">
-                Admin Panel Login
-              </Link>
-            </li>
           </ul>
         </div>
       </div>
@@ -146,6 +141,19 @@ export const Footer: React.FC = () => {
           </p>
         </div>
       </div>
+
+      {/* Discreet Admin Access Shortcut */}
+      <Link
+        to="/admin/login"
+        aria-label="Admin"
+        className="fixed z-50 flex items-center justify-center w-7 h-7 focus:outline-hidden"
+        style={{
+          right: 'max(8px, env(safe-area-inset-right, 8px))',
+          bottom: 'max(8px, env(safe-area-inset-bottom, 8px))',
+        }}
+      >
+        <span className="w-[7px] h-[7px] rounded-full bg-slate-400/60 hover:bg-slate-500 transition-colors pointer-events-none" />
+      </Link>
     </footer>
   );
 };

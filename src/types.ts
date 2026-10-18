@@ -20,6 +20,8 @@ export interface Post {
   meta_description?: string | null;
   official_source_url?: string | null;
   keywords?: string[];
+  source_type?: 'MANUAL' | 'AI_RESEARCH';
+  ai_draft_id?: string | null;
   published: boolean;
   author_id?: string | null;
   created_at: string;
@@ -37,6 +39,8 @@ export interface PostFormData {
   meta_description: string;
   official_source_url?: string;
   keywords: string; // Comma separated for form input
+  source_type?: 'MANUAL' | 'AI_RESEARCH';
+  ai_draft_id?: string;
   published: boolean;
 }
 
