@@ -94,25 +94,31 @@
     text-decoration: underline;
     text-underline-offset: 3px;
     transition: color 0.15s ease;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   .article-content a:hover {
     color: #1e3a8a;
   }
 
-  /* Table styling for Sarkari Job Vacancies & Important Links */
+  /* Table container & responsive wrapping for Sarkari Job Vacancies & Updates */
   .table-responsive {
     width: 100%;
+    max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    margin-top: 1.25rem;
-    margin-bottom: 1.5rem;
+    margin-top: 1rem;
+    margin-bottom: 1.25rem;
   }
 
+  /* Tables automatically fit container width with fluid text wrapping */
   .table-responsive table,
   .article-content table {
-    width: 100%;
-    min-width: max-content;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    table-layout: auto;
     border-collapse: collapse;
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
@@ -123,33 +129,43 @@
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   }
 
-  @media (max-width: 640px) {
-    .table-responsive table,
-    .article-content table {
-      min-width: 580px;
-    }
-  }
-
   .article-content th,
   .article-content thead th {
     background-color: #1e3a8a !important;
     color: #ffffff !important;
     font-weight: 800 !important;
     text-align: left;
-    padding: 0.625rem 0.875rem !important;
+    padding: 0.625rem 0.75rem !important;
     border: 1px solid #2563eb !important;
     text-transform: uppercase;
     font-size: 0.75rem !important;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
+    letter-spacing: 0.04em;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    hyphens: manual;
+    vertical-align: middle;
   }
 
   .article-content td {
-    padding: 0.625rem 0.875rem;
+    padding: 0.625rem 0.75rem;
     border: 1px solid #cbd5e1;
     color: #1e293b;
     font-weight: 500;
     vertical-align: top;
+    white-space: normal;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    hyphens: manual;
+  }
+
+  /* Ensure long links and URLs inside table cells break and wrap naturally */
+  .article-content td a,
+  .article-content th a {
+    overflow-wrap: anywhere !important;
+    word-break: break-all !important;
+    display: inline;
+    max-width: 100%;
   }
 
   .article-content tr:nth-child(even) {
@@ -158,6 +174,21 @@
 
   .article-content tr:hover {
     background-color: #eff6ff;
+  }
+
+  @media (max-width: 640px) {
+    .article-content table {
+      font-size: 0.8125rem;
+    }
+    .article-content th,
+    .article-content thead th {
+      padding: 0.5rem 0.5rem !important;
+      font-size: 0.7rem !important;
+    }
+    .article-content td {
+      padding: 0.5rem 0.5rem;
+      font-size: 0.8125rem;
+    }
   }
 
   /* Callouts & Notices */
@@ -172,15 +203,51 @@
     color: #166534;
     border-color: #16a34a;
     font-weight: 600;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    max-width: 100%;
   }
 
+  /* Wide media & embedded elements never exceed article width */
   .article-content img {
-    max-width: 100%;
-    height: auto;
+    max-width: 100% !important;
+    height: auto !important;
     border-radius: 0.75rem;
     margin: 1.25rem auto;
     display: block;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+  }
+
+  .article-content pre {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    background-color: #0f172a;
+    color: #f8fafc;
+    padding: 0.875rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 1.25rem 0;
+  }
+
+  .article-content code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.875em;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .article-content iframe,
+  .article-content embed,
+  .article-content object,
+  .article-content video {
+    max-width: 100% !important;
+    border: 0;
+    border-radius: 0.5rem;
   }
 
   .article-content hr {

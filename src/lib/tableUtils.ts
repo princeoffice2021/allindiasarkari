@@ -148,7 +148,7 @@ export function convertTabularTextToHtmlTable(text: string): string {
     </tbody>`;
 
   return `
-<div class="table-responsive my-4 overflow-x-auto">
+<div class="table-responsive my-4">
   <table class="w-full text-left border-collapse border border-slate-300">
     ${theadHtml}
     ${tbodyHtml}
@@ -259,6 +259,18 @@ export function cleanAndRepairTable(table: HTMLTableElement): HTMLTableElement {
         }
       }
 
+      // Clear rigid fixed width and whitespace locks on cells so contents wrap fluidly
+      const rawCellWidth = cell.getAttribute('width');
+      if (rawCellWidth && !rawCellWidth.includes('%')) {
+        cell.removeAttribute('width');
+      }
+      if (cell.style.whiteSpace === 'nowrap') {
+        cell.style.whiteSpace = 'normal';
+      }
+      if (cell.style.minWidth) {
+        cell.style.minWidth = '0px';
+      }
+
       // Ensure empty cell content has at least a non-breaking space or clean HTML so browser doesn't collapse it
       if (!cell.innerHTML || cell.innerHTML.trim() === '') {
         cell.innerHTML = '&nbsp;';
@@ -288,6 +300,16 @@ export function cleanAndRepairTable(table: HTMLTableElement): HTMLTableElement {
     table.classList.add('w-full', 'text-left', 'border-collapse', 'border', 'border-slate-300');
   }
 
+  // Ensure table can fluidly contract to fit container width without artificial min-width
+  table.style.maxWidth = '100%';
+  if (table.style.minWidth) {
+    table.style.minWidth = '0px';
+  }
+  const rawTableWidth = table.getAttribute('width');
+  if (rawTableWidth && !rawTableWidth.includes('%')) {
+    table.removeAttribute('width');
+  }
+
   return table;
 }
 
@@ -314,7 +336,7 @@ export function processAndRepairHtmlTables(rawHtml: string): string {
     const parent = table.parentElement;
     if (!parent || !parent.classList.contains('table-responsive')) {
       const wrapper = doc.createElement('div');
-      wrapper.className = 'table-responsive my-4 overflow-x-auto';
+      wrapper.className = 'table-responsive';
       table.parentNode?.insertBefore(wrapper, table);
       wrapper.appendChild(table);
     }

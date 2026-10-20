@@ -3,13 +3,15 @@ import { Link } from 'react-router-dom';
 import { Calendar, ArrowRight, MapPin } from 'lucide-react';
 import { Post } from '../types';
 import { CategoryBadge } from './CategoryBadge';
+import { OptimizedImage } from './OptimizedImage';
 
 interface PostCardProps {
   post: Post;
   compact?: boolean;
+  priority?: boolean;
 }
 
-export const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
+export const PostCard: React.FC<PostCardProps> = ({ post, compact = false, priority = false }) => {
   const formattedDate = new Date(post.created_at).toLocaleDateString('en-IN', {
     day: 'numeric',
     month: 'short',
@@ -66,17 +68,17 @@ export const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => 
       {/* Featured Image */}
       {post.image_url ? (
         <Link to={`/post/${post.slug}`} className="relative aspect-16/9 overflow-hidden bg-slate-100">
-          <img
+          <OptimizedImage
             src={post.image_url}
             alt={post.title}
+            priority={priority}
             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
           />
-          <div className="absolute top-2.5 left-2.5">
+          <div className="absolute top-2.5 left-2.5 z-10">
             <CategoryBadge category={post.category} size="md" />
           </div>
           {post.state && (
-            <div className="absolute bottom-2.5 right-2.5 rounded-md bg-slate-900/80 backdrop-blur-xs px-2 py-0.5 text-[11px] font-bold text-white flex items-center gap-1">
+            <div className="absolute bottom-2.5 right-2.5 z-10 rounded-md bg-slate-900/80 backdrop-blur-xs px-2 py-0.5 text-[11px] font-bold text-white flex items-center gap-1">
               <MapPin className="h-3 w-3 text-amber-400" />
               {post.state}
             </div>

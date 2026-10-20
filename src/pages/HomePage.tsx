@@ -71,42 +71,54 @@ export const HomePage: React.FC = () => {
       },
     });
 
-    async function loadData() {
+    async function loadInitialData() {
       setLoading(true);
-      const latest = await getLatestPosts(20);
-      setLatestPosts(latest);
+      try {
+        const categoriesToFetch = [
+          'Sarkari Yojana',
+          'Sarkari Naukri',
+          'Results',
+          'Admit Card',
+          'Answer Key',
+          'Syllabus',
+          'Scholarship',
+          'Current Affairs',
+        ] as const;
 
-      // Fetch sample posts for key category sections
-      const categoriesToFetch = [
-        'Sarkari Yojana',
-        'Sarkari Naukri',
-        'Results',
-        'Admit Card',
-        'Answer Key',
-        'Syllabus',
-        'Scholarship',
-        'Current Affairs',
-      ] as const;
+        const [latest, ...catResults] = await Promise.all([
+          getLatestPosts(20),
+          ...categoriesToFetch.map((cat) => getPostsByCategory(cat, 1, 4)),
+        ]);
 
-      const catData: Record<string, Post[]> = {};
-      for (const cat of categoriesToFetch) {
-        const res = await getPostsByCategory(cat, 1, 4);
-        catData[cat] = res.posts;
+        setLatestPosts(latest);
+
+        const catData: Record<string, Post[]> = {};
+        categoriesToFetch.forEach((cat, idx) => {
+          catData[cat] = catResults[idx]?.posts || [];
+        });
+        setCategoryPosts(catData);
+
+        // Compute initial state tab posts from latest posts
+        const filteredForState = latest.filter(
+          (p) => p.state && p.state.toLowerCase() === selectedStateTab.toLowerCase()
+        );
+        setStateTabPosts(filteredForState.length > 0 ? filteredForState : latest.slice(0, 3));
+      } finally {
+        setLoading(false);
       }
-      setCategoryPosts(catData);
-
-      // Load state tab posts
-      const stateRes = await getLatestPosts(10);
-      const filteredForState = stateRes.filter(
-        (p) => p.state && p.state.toLowerCase() === selectedStateTab.toLowerCase()
-      );
-      setStateTabPosts(filteredForState.length > 0 ? filteredForState : latest.slice(0, 3));
-
-      setLoading(false);
     }
 
-    loadData();
-  }, [selectedStateTab]);
+    loadInitialData();
+  }, []);
+
+  // Update state tab posts without re-fetching entire homepage when user toggles state
+  useEffect(() => {
+    if (latestPosts.length === 0) return;
+    const filteredForState = latestPosts.filter(
+      (p) => p.state && p.state.toLowerCase() === selectedStateTab.toLowerCase()
+    );
+    setStateTabPosts(filteredForState.length > 0 ? filteredForState : latestPosts.slice(0, 3));
+  }, [selectedStateTab, latestPosts]);
 
   return (
     <div className="space-y-8 pb-12">
@@ -174,8 +186,12 @@ export const HomePage: React.FC = () => {
                   return (
                     <div key={`post-group-${groupIdx}`} className="space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {chunk.map((post) => (
-                          <PostCard key={post.id} post={post} />
+                        {chunk.map((post, postIdx) => (
+                          <PostCard
+                            key={post.id}
+                            post={post}
+                            priority={groupIdx === 0 && postIdx === 0}
+                          />
                         ))}
                       </div>
 

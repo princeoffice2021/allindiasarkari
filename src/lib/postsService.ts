@@ -513,73 +513,128 @@ function setLocalPosts(posts: Post[]): void {
 }
 
 // ==========================================
+// IN-MEMORY CACHE & REQUEST DEDUPLICATION
+// ==========================================
+const postsCache = new Map<string, { data: unknown; expiry: number }>();
+const inFlightRequests = new Map<string, Promise<unknown>>();
+const CACHE_TTL_MS = 60 * 1000; // 60 seconds
+
+export function clearPostsCache(): void {
+  postsCache.clear();
+  inFlightRequests.clear();
+}
+
+function getCached<T>(key: string): T | null {
+  const item = postsCache.get(key);
+  if (!item) return null;
+  if (Date.now() > item.expiry) {
+    postsCache.delete(key);
+    return null;
+  }
+  return item.data as T;
+}
+
+function setCache<T>(key: string, data: T, ttlMs = CACHE_TTL_MS): void {
+  postsCache.set(key, { data, expiry: Date.now() + ttlMs });
+}
+
+async function withCache<T>(key: string, fetcher: () => Promise<T>, ttlMs = CACHE_TTL_MS): Promise<T> {
+  const cached = getCached<T>(key);
+  if (cached !== null) {
+    return cached;
+  }
+
+  const existing = inFlightRequests.get(key);
+  if (existing) {
+    return existing as Promise<T>;
+  }
+
+  const request = (async () => {
+    try {
+      const data = await fetcher();
+      setCache(key, data, ttlMs);
+      return data;
+    } finally {
+      inFlightRequests.delete(key);
+    }
+  })();
+
+  inFlightRequests.set(key, request);
+  return request;
+}
+
+// ==========================================
 // PUBLIC POST FETCHING SERVICE METHODS
 // ==========================================
 
 export async function getLatestPosts(limit = 10): Promise<Post[]> {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .eq('published', true)
-        .order('created_at', { ascending: false })
-        .limit(limit);
+  return withCache(`latest_${limit}`, async () => {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('posts')
+          .select('*')
+          .eq('published', true)
+          .order('created_at', { ascending: false })
+          .limit(limit);
 
-      if (!error && data && data.length > 0) {
-        return data as Post[];
+        if (!error && data && data.length > 0) {
+          return data as Post[];
+        }
+      } catch (err) {
+        console.warn('Supabase fetch fallback to local:', err);
       }
-    } catch (err) {
-      console.warn('Supabase fetch fallback to local:', err);
     }
-  }
 
-  const posts = getLocalPosts().filter((p) => p.published);
-  return posts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, limit);
+    const posts = getLocalPosts().filter((p) => p.published);
+    return posts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, limit);
+  });
 }
 
 export async function getAllPublishedPosts(
   page = 1,
   limit = 12
 ): Promise<{ posts: Post[]; total: number; totalPages: number }> {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const from = (page - 1) * limit;
-      const to = from + limit - 1;
+  return withCache(`all_pub_${page}_${limit}`, async () => {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const from = (page - 1) * limit;
+        const to = from + limit - 1;
 
-      const { data, count, error } = await supabase
-        .from('posts')
-        .select('*', { count: 'exact' })
-        .eq('published', true)
-        .order('created_at', { ascending: false })
-        .range(from, to);
+        const { data, count, error } = await supabase
+          .from('posts')
+          .select('*', { count: 'exact' })
+          .eq('published', true)
+          .order('created_at', { ascending: false })
+          .range(from, to);
 
-      if (!error && data) {
-        const total = count || data.length;
-        return {
-          posts: data as Post[],
-          total,
-          totalPages: Math.ceil(total / limit) || 1,
-        };
+        if (!error && data) {
+          const total = count || data.length;
+          return {
+            posts: data as Post[],
+            total,
+            totalPages: Math.ceil(total / limit) || 1,
+          };
+        }
+      } catch (err) {
+        console.warn('Supabase getAllPublishedPosts fallback:', err);
       }
-    } catch (err) {
-      console.warn('Supabase getAllPublishedPosts fallback:', err);
     }
-  }
 
-  const posts = getLocalPosts()
-    .filter((p) => p.published)
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    const posts = getLocalPosts()
+      .filter((p) => p.published)
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-  const total = posts.length;
-  const startIndex = (page - 1) * limit;
-  const paginatedPosts = posts.slice(startIndex, startIndex + limit);
+    const total = posts.length;
+    const startIndex = (page - 1) * limit;
+    const paginatedPosts = posts.slice(startIndex, startIndex + limit);
 
-  return {
-    posts: paginatedPosts,
-    total,
-    totalPages: Math.ceil(total / limit) || 1,
-  };
+    return {
+      posts: paginatedPosts,
+      total,
+      totalPages: Math.ceil(total / limit) || 1,
+    };
+  });
 }
 
 export async function getPostsByCategory(
@@ -590,61 +645,64 @@ export async function getPostsByCategory(
 ): Promise<{ posts: Post[]; total: number; totalPages: number }> {
   const normCategory = slugToCategory(categoryInput) || categoryInput;
   const normSlug = categoryToSlug(normCategory as CategoryType) || categoryInput;
+  const cacheKey = `cat_${normCategory}_${page}_${limit}_${stateFilter || ''}`;
 
-  if (isSupabaseConfigured && supabase) {
-    try {
-      let query = supabase
-        .from('posts')
-        .select('*', { count: 'exact' })
-        .eq('published', true)
-        .or(`category.eq.${normCategory},category.eq.${normSlug},category.ilike.%${normCategory}%`);
+  return withCache(cacheKey, async () => {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        let query = supabase
+          .from('posts')
+          .select('*', { count: 'exact' })
+          .eq('published', true)
+          .or(`category.eq.${normCategory},category.eq.${normSlug},category.ilike.%${normCategory}%`);
 
-      if (stateFilter) {
-        query = query.ilike('state', `%${stateFilter}%`);
+        if (stateFilter) {
+          query = query.ilike('state', `%${stateFilter}%`);
+        }
+
+        const from = (page - 1) * limit;
+        const to = from + limit - 1;
+
+        const { data, count, error } = await query
+          .order('created_at', { ascending: false })
+          .range(from, to);
+
+        if (!error && data) {
+          const total = count || data.length;
+          return {
+            posts: data as Post[],
+            total,
+            totalPages: Math.ceil(total / limit) || 1,
+          };
+        }
+      } catch (err) {
+        console.warn('Supabase category fetch fallback:', err);
       }
-
-      const from = (page - 1) * limit;
-      const to = from + limit - 1;
-
-      const { data, count, error } = await query
-        .order('created_at', { ascending: false })
-        .range(from, to);
-
-      if (!error && data) {
-        const total = count || data.length;
-        return {
-          posts: data as Post[],
-          total,
-          totalPages: Math.ceil(total / limit) || 1,
-        };
-      }
-    } catch (err) {
-      console.warn('Supabase category fetch fallback:', err);
     }
-  }
 
-  let posts = getLocalPosts().filter(
-    (p) =>
-      p.published &&
-      (p.category.toLowerCase() === normCategory.toLowerCase() ||
-        p.category.toLowerCase() === normSlug.toLowerCase())
-  );
-  if (stateFilter) {
-    posts = posts.filter(
-      (p) => p.state && p.state.toLowerCase().includes(stateFilter.toLowerCase())
+    let posts = getLocalPosts().filter(
+      (p) =>
+        p.published &&
+        (p.category.toLowerCase() === normCategory.toLowerCase() ||
+          p.category.toLowerCase() === normSlug.toLowerCase())
     );
-  }
+    if (stateFilter) {
+      posts = posts.filter(
+        (p) => p.state && p.state.toLowerCase().includes(stateFilter.toLowerCase())
+      );
+    }
 
-  posts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-  const total = posts.length;
-  const startIndex = (page - 1) * limit;
-  const paginatedPosts = posts.slice(startIndex, startIndex + limit);
+    posts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    const total = posts.length;
+    const startIndex = (page - 1) * limit;
+    const paginatedPosts = posts.slice(startIndex, startIndex + limit);
 
-  return {
-    posts: paginatedPosts,
-    total,
-    totalPages: Math.ceil(total / limit) || 1,
-  };
+    return {
+      posts: paginatedPosts,
+      total,
+      totalPages: Math.ceil(total / limit) || 1,
+    };
+  });
 }
 
 export async function getPostsByState(
@@ -653,79 +711,87 @@ export async function getPostsByState(
   limit = 12,
   categoryFilter?: string
 ): Promise<{ posts: Post[]; total: number; totalPages: number }> {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const from = (page - 1) * limit;
-      const to = from + limit - 1;
+  const cacheKey = `state_${stateName}_${page}_${limit}_${categoryFilter || ''}`;
 
-      let query = supabase
-        .from('posts')
-        .select('*', { count: 'exact' })
-        .eq('published', true)
-        .ilike('state', `%${stateName}%`);
+  return withCache(cacheKey, async () => {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const from = (page - 1) * limit;
+        const to = from + limit - 1;
 
-      if (categoryFilter && categoryFilter !== 'All') {
-        const normCat = slugToCategory(categoryFilter) || categoryFilter;
-        query = query.or(`category.eq.${normCat},category.ilike.%${normCat}%`);
+        let query = supabase
+          .from('posts')
+          .select('*', { count: 'exact' })
+          .eq('published', true)
+          .ilike('state', `%${stateName}%`);
+
+        if (categoryFilter && categoryFilter !== 'All') {
+          const normCat = slugToCategory(categoryFilter) || categoryFilter;
+          query = query.or(`category.eq.${normCat},category.ilike.%${normCat}%`);
+        }
+
+        const { data, count, error } = await query
+          .order('created_at', { ascending: false })
+          .range(from, to);
+
+        if (!error && data) {
+          const total = count || data.length;
+          return {
+            posts: data as Post[],
+            total,
+            totalPages: Math.ceil(total / limit) || 1,
+          };
+        }
+      } catch (err) {
+        console.warn('Supabase state fetch fallback:', err);
       }
-
-      const { data, count, error } = await query
-        .order('created_at', { ascending: false })
-        .range(from, to);
-
-      if (!error && data) {
-        const total = count || data.length;
-        return {
-          posts: data as Post[],
-          total,
-          totalPages: Math.ceil(total / limit) || 1,
-        };
-      }
-    } catch (err) {
-      console.warn('Supabase state fetch fallback:', err);
     }
-  }
 
-  let posts = getLocalPosts().filter(
-    (p) => p.published && p.state && p.state.toLowerCase() === stateName.toLowerCase()
-  );
+    let posts = getLocalPosts().filter(
+      (p) => p.published && p.state && p.state.toLowerCase() === stateName.toLowerCase()
+    );
 
-  if (categoryFilter && categoryFilter !== 'All') {
-    const normCat = (slugToCategory(categoryFilter) || categoryFilter).toLowerCase();
-    posts = posts.filter((p) => p.category.toLowerCase() === normCat);
-  }
+    if (categoryFilter && categoryFilter !== 'All') {
+      const normCat = (slugToCategory(categoryFilter) || categoryFilter).toLowerCase();
+      posts = posts.filter((p) => p.category.toLowerCase() === normCat);
+    }
 
-  posts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-  const total = posts.length;
-  const startIndex = (page - 1) * limit;
-  const paginatedPosts = posts.slice(startIndex, startIndex + limit);
+    posts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    const total = posts.length;
+    const startIndex = (page - 1) * limit;
+    const paginatedPosts = posts.slice(startIndex, startIndex + limit);
 
-  return {
-    posts: paginatedPosts,
-    total,
-    totalPages: Math.ceil(total / limit) || 1,
-  };
+    return {
+      posts: paginatedPosts,
+      total,
+      totalPages: Math.ceil(total / limit) || 1,
+    };
+  });
 }
 
 export async function getPostBySlug(slug: string, includeDrafts = false): Promise<Post | null> {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      let query = supabase.from('posts').select('*').eq('slug', slug);
-      if (!includeDrafts) {
-        query = query.eq('published', true);
-      }
-      const { data, error } = await query.single();
+  const cacheKey = `post_slug_${slug}_${includeDrafts}`;
 
-      if (!error && data) {
-        return data as Post;
+  return withCache(cacheKey, async () => {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        let query = supabase.from('posts').select('*').eq('slug', slug);
+        if (!includeDrafts) {
+          query = query.eq('published', true);
+        }
+        const { data, error } = await query.single();
+
+        if (!error && data) {
+          return data as Post;
+        }
+      } catch (err) {
+        console.warn('Supabase getPostBySlug fallback:', err);
       }
-    } catch (err) {
-      console.warn('Supabase getPostBySlug fallback:', err);
     }
-  }
 
-  const posts = getLocalPosts();
-  return posts.find((p) => p.slug === slug && (includeDrafts || p.published)) || null;
+    const posts = getLocalPosts();
+    return posts.find((p) => p.slug === slug && (includeDrafts || p.published)) || null;
+  });
 }
 
 export async function searchPosts(
@@ -811,29 +877,32 @@ export async function getRelatedPosts(
   currentSlug: string,
   limit = 4
 ): Promise<Post[]> {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .eq('published', true)
-        .eq('category', category)
-        .neq('slug', currentSlug)
-        .order('created_at', { ascending: false })
-        .limit(limit);
+  const cacheKey = `related_${category}_${currentSlug}_${limit}`;
+  return withCache(cacheKey, async () => {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('posts')
+          .select('*')
+          .eq('published', true)
+          .eq('category', category)
+          .neq('slug', currentSlug)
+          .order('created_at', { ascending: false })
+          .limit(limit);
 
-      if (!error && data && data.length > 0) {
-        return data as Post[];
+        if (!error && data && data.length > 0) {
+          return data as Post[];
+        }
+      } catch (err) {
+        console.warn('Supabase related posts fallback:', err);
       }
-    } catch (err) {
-      console.warn('Supabase related posts fallback:', err);
     }
-  }
 
-  const posts = getLocalPosts().filter(
-    (p) => p.published && p.category === category && p.slug !== currentSlug
-  );
-  return posts.slice(0, limit);
+    const posts = getLocalPosts().filter(
+      (p) => p.published && p.category === category && p.slug !== currentSlug
+    );
+    return posts.slice(0, limit);
+  });
 }
 
 export async function getPopularPosts(limit = 6): Promise<Post[]> {
@@ -887,6 +956,7 @@ export async function getPostByIdAdmin(id: string): Promise<Post | null> {
 }
 
 export async function createPost(formData: PostFormData): Promise<Post> {
+  clearPostsCache();
   const slug = formData.slug || generateSlug(formData.title);
   const keywordsArray = formData.keywords
     ? formData.keywords.split(',').map((k) => k.trim()).filter(Boolean)
@@ -939,6 +1009,7 @@ export async function createPost(formData: PostFormData): Promise<Post> {
 }
 
 export async function updatePost(id: string, formData: PostFormData): Promise<Post> {
+  clearPostsCache();
   const slug = formData.slug || generateSlug(formData.title);
   const keywordsArray = formData.keywords
     ? formData.keywords.split(',').map((k) => k.trim()).filter(Boolean)
@@ -993,6 +1064,7 @@ export async function updatePost(id: string, formData: PostFormData): Promise<Po
 }
 
 export async function deletePost(id: string): Promise<boolean> {
+  clearPostsCache();
   if (isSupabaseConfigured && supabase) {
     try {
       const { error } = await supabase.from('posts').delete().eq('id', id);

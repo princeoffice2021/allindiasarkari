@@ -9,6 +9,8 @@ import { CategoryBadge } from '../components/CategoryBadge';
 import { ShareButtons } from '../components/ShareButtons';
 import { Sidebar } from '../components/Sidebar';
 import { AdSlot } from '../components/AdSlot';
+import { OptimizedImage } from '../components/OptimizedImage';
+import { AuthorBio } from '../components/AuthorBio';
 import { categoryToSlug, stateToSlug } from '../data/statesAndCategories';
 import { Calendar, Clock, MapPin, Tag, Sparkles, ArrowRight, User, ExternalLink } from 'lucide-react';
 
@@ -242,11 +244,10 @@ export const PostPage: React.FC = () => {
             {/* Featured Image */}
             {post.image_url && (
               <div className="overflow-hidden rounded-xl border border-slate-200 shadow-xs max-h-[440px] bg-slate-50">
-                <img
+                <OptimizedImage
                   src={post.image_url}
                   alt={post.title}
-                  loading="lazy"
-                  decoding="async"
+                  priority={true}
                   className="w-full h-full object-cover max-h-[440px]"
                 />
               </div>
@@ -263,8 +264,8 @@ export const PostPage: React.FC = () => {
               </div>
             )}
 
-            {/* Article Content Body with Safe Custom Typography & Table Auto-Scroll */}
-            <div className="article-content overflow-x-auto">
+            {/* Article Content Body with Safe Custom Typography & Responsive Layout */}
+            <div className="article-content max-w-full min-w-0">
               <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
             </div>
 
@@ -312,6 +313,9 @@ export const PostPage: React.FC = () => {
                 </a>
               </div>
             )}
+
+            {/* Author Information Section */}
+            <AuthorBio />
 
             {/* Official Information Disclaimer Notice */}
             <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-3.5 text-xs text-amber-950 font-medium space-y-1">

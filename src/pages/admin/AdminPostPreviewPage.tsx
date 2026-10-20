@@ -139,7 +139,7 @@ export const AdminPostPreviewPage: React.FC = () => {
 
           <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
             <div
-              className="article-content overflow-x-auto"
+              className="article-content max-w-full min-w-0"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           </div>

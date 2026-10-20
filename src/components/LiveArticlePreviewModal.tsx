@@ -186,7 +186,7 @@ export const LiveArticlePreviewModal: React.FC<LiveArticlePreviewModalProps> = (
             )}
 
             {/* Article Content Render */}
-            <div className="article-content overflow-x-auto">
+            <div className="article-content max-w-full min-w-0">
               {sanitizedContent ? (
                 <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
               ) : (

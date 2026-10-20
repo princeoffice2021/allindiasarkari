@@ -41,8 +41,8 @@ export const PostList: React.FC<PostListProps> = ({
   return (
     <div className="space-y-6">
       <div className={gridClass}>
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} compact={compact} />
+        {posts.map((post, index) => (
+          <PostCard key={post.id} post={post} compact={compact} priority={index === 0} />
         ))}
       </div>
 
