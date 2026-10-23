@@ -216,6 +216,9 @@ async function startServer() {
     res.status(404).json({ error: `Endpoint ${req.path} not found` });
   });
 
+  // Serve static files from public directory (e.g. ads.txt, robots.txt, sitemap.xml)
+  app.use(express.static(path.join(process.cwd(), 'public')));
+
   // Vite middleware in dev / Static serving in production
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
