@@ -88,6 +88,50 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
             </nav>
           </div>
 
+          {/* Career Blogs Section */}
+          <div>
+            <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+              Career Blogs / करियर गाइड
+            </h3>
+            <div className="space-y-1">
+              <NavLink
+                to="/blogs/hindi"
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors ${
+                    isActive
+                      ? 'bg-amber-50 text-amber-950 font-bold'
+                      : 'text-slate-700 hover:bg-slate-100'
+                  }`
+                }
+              >
+                <span className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-amber-500" />
+                  हिंदी करियर ब्लॉग्स
+                </span>
+                <ChevronRight className="h-4 w-4 text-slate-400" />
+              </NavLink>
+
+              <NavLink
+                to="/blogs/english"
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors ${
+                    isActive
+                      ? 'bg-blue-50 text-blue-900 font-bold'
+                      : 'text-slate-700 hover:bg-slate-100'
+                  }`
+                }
+              >
+                <span className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-blue-600" />
+                  English Career Blog
+                </span>
+                <ChevronRight className="h-4 w-4 text-slate-400" />
+              </NavLink>
+            </div>
+          </div>
+
           {/* Popular State Jobs */}
           <div>
             <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-400">

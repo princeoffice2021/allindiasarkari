@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllPostsAdmin } from '../lib/postsService';
+import { getAllCareerBlogsAdmin } from '../lib/careerBlogsService';
 import { Post } from '../types';
+import { CareerBlog } from '../types/careerBlog';
 import { CATEGORIES_CONFIG, ALL_INDIAN_STATES, ALL_UNION_TERRITORIES, ALL_STATES_AND_UTS, stateToSlug } from '../data/statesAndCategories';
 import { BASE_URL, updateSEO } from '../lib/seo';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-import { FileCode, Globe, Check, BookOpen, MapPin, ShieldCheck, FileText } from 'lucide-react';
+import { FileCode, Globe, Check, BookOpen, MapPin, ShieldCheck, FileText, Languages } from 'lucide-react';
 
 export const SitemapPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [careerBlogs, setCareerBlogs] = useState<CareerBlog[]>([]);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'html' | 'xml'>('html');
 
@@ -20,6 +23,7 @@ export const SitemapPage: React.FC = () => {
     });
 
     getAllPostsAdmin().then((data) => setPosts(data.filter((p) => p.published)));
+    getAllCareerBlogsAdmin().then((data) => setCareerBlogs(data.filter((b) => b.published)));
   }, []);
 
   const baseUrl = BASE_URL;
@@ -78,7 +82,32 @@ export const SitemapPage: React.FC = () => {
   </url>`
   ).join('')}
 
-  <!-- Published Articles -->
+  <!-- Career Blog Portals (Hindi & English) -->
+  <url>
+    <loc>${baseUrl}/blogs/hindi</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/blogs/english</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Published Career Blogs -->
+  ${careerBlogs
+    .map(
+      (b) => `
+  <url>
+    <loc>${baseUrl}/blogs/${b.language}/${b.slug}</loc>
+    <lastmod>${new Date(b.updated_at || b.created_at).toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`
+    )
+    .join('')}
+
+  <!-- Published Sarkari Job Posts & Schemes -->
   ${posts
     .map(
       (p) => `
@@ -250,6 +279,45 @@ export const SitemapPage: React.FC = () => {
                   className="rounded-lg bg-slate-50 border border-slate-200 p-2 text-slate-800 hover:bg-blue-50 hover:text-blue-900 hover:border-blue-300 font-semibold truncate transition-colors"
                 >
                   • {ut} Jobs
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Career Blogs Section (Hindi & English) */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
+              <h2 className="text-sm font-black uppercase tracking-wide text-slate-900 flex items-center gap-2">
+                <Languages className="h-4 w-4 text-blue-900" />
+                Career Blogs & Job Preparation Articles ({careerBlogs.length})
+              </h2>
+              <div className="flex items-center gap-3 text-xs">
+                <Link to="/blogs/hindi" className="text-amber-800 font-bold hover:underline">
+                  🌐 हिंदी ब्लॉग्स
+                </Link>
+                <span className="text-slate-300">•</span>
+                <Link to="/blogs/english" className="text-blue-900 font-bold hover:underline">
+                  🌐 English Blogs
+                </Link>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              {careerBlogs.map((b) => (
+                <Link
+                  key={b.id}
+                  to={`/blogs/${b.language}/${b.slug}`}
+                  className="p-2.5 rounded-lg border border-slate-100 bg-slate-50/70 hover:bg-blue-50 hover:border-blue-200 text-slate-900 hover:text-blue-900 font-medium line-clamp-1 transition-colors"
+                >
+                  <span
+                    className={`font-black text-[10px] uppercase px-1.5 py-0.5 rounded mr-1.5 ${
+                      b.language === 'hindi'
+                        ? 'bg-amber-100 text-amber-900'
+                        : 'bg-blue-100 text-blue-900'
+                    }`}
+                  >
+                    {b.language === 'hindi' ? 'Hindi' : 'English'}
+                  </span>
+                  <span className="font-bold text-slate-700 mr-1">[{b.category}]</span> {b.title}
                 </Link>
               ))}
             </div>

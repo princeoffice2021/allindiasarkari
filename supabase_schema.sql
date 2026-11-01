@@ -131,3 +131,94 @@ CREATE POLICY "Admin write states" ON public.states FOR ALL TO authenticated USI
 
 CREATE POLICY "Public read settings" ON public.site_settings FOR SELECT USING (true);
 CREATE POLICY "Admin write settings" ON public.site_settings FOR ALL TO authenticated USING (true);
+
+-- ====================================================================
+-- 7. CAREER BLOGS & CAREER CATEGORIES
+-- ====================================================================
+
+CREATE TABLE IF NOT EXISTS public.career_blog_categories (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL UNIQUE,
+  slug TEXT NOT NULL UNIQUE,
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.career_blogs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  language TEXT NOT NULL CHECK (language IN ('hindi', 'english')),
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  excerpt TEXT,
+  content TEXT NOT NULL,
+  category TEXT NOT NULL,
+  tags TEXT[],
+  author_name TEXT DEFAULT 'Prince Sharma',
+  image_url TEXT,
+  meta_title TEXT,
+  meta_description TEXT,
+  focus_keyword TEXT,
+  canonical_url TEXT,
+  published BOOLEAN DEFAULT false,
+  is_deleted BOOLEAN DEFAULT false,
+  published_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT career_blogs_lang_slug_unique UNIQUE (language, slug)
+);
+
+-- Fast Query Indexes
+CREATE INDEX IF NOT EXISTS idx_career_blogs_lang ON public.career_blogs(language);
+CREATE INDEX IF NOT EXISTS idx_career_blogs_slug ON public.career_blogs(slug);
+CREATE INDEX IF NOT EXISTS idx_career_blogs_lang_slug ON public.career_blogs(language, slug);
+CREATE INDEX IF NOT EXISTS idx_career_blogs_category ON public.career_blogs(category);
+CREATE INDEX IF NOT EXISTS idx_career_blogs_published ON public.career_blogs(published);
+CREATE INDEX IF NOT EXISTS idx_career_blogs_created_at ON public.career_blogs(created_at DESC);
+
+-- Enable RLS
+ALTER TABLE public.career_blog_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.career_blogs ENABLE ROW LEVEL SECURITY;
+
+-- Policies for career_blog_categories
+CREATE POLICY "Public read career blog categories"
+  ON public.career_blog_categories
+  FOR SELECT
+  USING (true);
+
+CREATE POLICY "Admin write career blog categories"
+  ON public.career_blog_categories
+  FOR ALL
+  TO authenticated
+  USING (true);
+
+-- Policies for career_blogs
+CREATE POLICY "Public visitors can view published career blogs"
+  ON public.career_blogs
+  FOR SELECT
+  USING (published = true AND (is_deleted IS FALSE OR is_deleted IS NULL));
+
+CREATE POLICY "Authenticated admins can view all career blogs"
+  ON public.career_blogs
+  FOR SELECT
+  TO authenticated
+  USING (true);
+
+CREATE POLICY "Authenticated admins can insert career blogs"
+  ON public.career_blogs
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated admins can update career blogs"
+  ON public.career_blogs
+  FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated admins can delete career blogs"
+  ON public.career_blogs
+  FOR DELETE
+  TO authenticated
+  USING (true);
+

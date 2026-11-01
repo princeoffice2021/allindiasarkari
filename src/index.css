@@ -2,6 +2,39 @@
 @plugin "@tailwindcss/typography";
 
 @layer components {
+  /* All India Sarkari - Unified 80% Desktop Website Container
+     - Large Desktop (>= 1200px):
+       The ENTIRE website (Header, Navigation, Main Content, Sidebar, Footer, and all their backgrounds)
+       is strictly contained inside one centered 80% width container (capped at 1536px for 4K).
+       Outer left & right margins (~10% each) remain visible from the very top of the page to the bottom.
+     - Tablets & Mobile (< 1200px):
+       100% fluid responsive width with comfortable mobile touch targets and zero clipping.
+  */
+  .site-wrapper {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+  }
+
+  @media (min-width: 1200px) {
+    .site-wrapper {
+      width: 80%;
+      max-width: 1536px;
+      box-shadow: 0 0 25px -5px rgba(0, 0, 0, 0.08);
+      border-left: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+    }
+  }
+
+  /* Shared container utility */
+  .site-container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+  }
+
   /* Rich Article Content Styles for Indian Sarkari Job Updates */
   .article-content {
     color: #1e293b;

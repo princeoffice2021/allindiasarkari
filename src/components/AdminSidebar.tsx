@@ -15,6 +15,8 @@ import {
   X,
   ShieldCheck,
   Bot,
+  BookOpen,
+  Languages,
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -47,6 +49,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     { label: 'AI Sarkari Staff', path: '/admin/ai-staff', icon: Bot, isAi: true },
     { label: 'Manage Posts', path: '/admin/posts', icon: FileText },
     { label: 'Add New Post', path: '/admin/posts/new', icon: PlusCircle },
+    { label: 'Career Blogs', path: '/admin/career-blogs', icon: BookOpen },
+    { label: 'Hindi Blogs (करियर)', path: '/admin/career-blogs/hindi', icon: Languages, indent: true },
+    { label: 'English Blogs', path: '/admin/career-blogs/english', icon: Languages, indent: true },
+    { label: 'Blog Categories', path: '/admin/career-blogs/categories', icon: FolderTree, indent: true },
     { label: 'Categories', path: '/admin/categories', icon: FolderTree },
     { label: 'States & UTs', path: '/admin/states', icon: MapPin },
     { label: 'Media Gallery', path: '/admin/media', icon: ImageIcon },
@@ -85,14 +91,16 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 key={item.path}
                 to={item.path}
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-bold transition-all ${
+                className={`flex items-center gap-3 rounded-xl py-2 text-xs font-bold transition-all ${
+                  item.indent ? 'pl-7 pr-3 text-[11px]' : 'px-3.5'
+                } ${
                   isActive
                     ? 'bg-blue-800 text-amber-300 shadow-sm font-black'
                     : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                 }`}
               >
                 <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-amber-400' : 'text-slate-400'}`} />
-                <span className="flex-1">{item.label}</span>
+                <span className="flex-1 truncate">{item.label}</span>
                 {item.isAi && (
                   <span className="rounded bg-amber-400/20 text-amber-300 px-1.5 py-0.2 text-[9px] font-black tracking-wider border border-amber-400/30">
                     AI

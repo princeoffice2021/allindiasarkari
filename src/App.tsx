@@ -38,6 +38,14 @@ const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage').t
 const AdminPostPreviewPage = lazy(() => import('./pages/admin/AdminPostPreviewPage').then((m) => ({ default: m.AdminPostPreviewPage })));
 const AIStaffDashboardPage = lazy(() => import('./pages/admin/ai-staff/AIStaffDashboardPage').then((m) => ({ default: m.AIStaffDashboardPage })));
 
+// Lazy-loaded Career Blog Pages
+const CareerBlogListPage = lazy(() => import('./pages/CareerBlogListPage').then((m) => ({ default: m.CareerBlogListPage })));
+const CareerBlogDetailPage = lazy(() => import('./pages/CareerBlogDetailPage').then((m) => ({ default: m.CareerBlogDetailPage })));
+const AdminCareerBlogsDashboardPage = lazy(() => import('./pages/admin/career-blogs/AdminCareerBlogsDashboardPage').then((m) => ({ default: m.AdminCareerBlogsDashboardPage })));
+const AdminCareerBlogsListPage = lazy(() => import('./pages/admin/career-blogs/AdminCareerBlogsListPage').then((m) => ({ default: m.AdminCareerBlogsListPage })));
+const AdminCareerBlogEditorPage = lazy(() => import('./pages/admin/career-blogs/AdminCareerBlogEditorPage').then((m) => ({ default: m.AdminCareerBlogEditorPage })));
+const AdminCareerBlogCategoriesPage = lazy(() => import('./pages/admin/career-blogs/AdminCareerBlogCategoriesPage').then((m) => ({ default: m.AdminCareerBlogCategoriesPage })));
+
 // Minimal non-blocking fallback spinner
 function PageLoadingFallback() {
   return (
@@ -103,6 +111,12 @@ function MainLayout() {
             <Route path="/admin/posts/new" element={<AdminPostEditorPage />} />
             <Route path="/admin/posts/:id/edit" element={<AdminPostEditorPage />} />
             <Route path="/admin/posts/:id/preview" element={<AdminPostPreviewPage />} />
+            <Route path="/admin/career-blogs" element={<AdminCareerBlogsDashboardPage />} />
+            <Route path="/admin/career-blogs/hindi" element={<AdminCareerBlogsListPage forcedLanguage="hindi" />} />
+            <Route path="/admin/career-blogs/english" element={<AdminCareerBlogsListPage forcedLanguage="english" />} />
+            <Route path="/admin/career-blogs/new" element={<AdminCareerBlogEditorPage />} />
+            <Route path="/admin/career-blogs/:id/edit" element={<AdminCareerBlogEditorPage />} />
+            <Route path="/admin/career-blogs/categories" element={<AdminCareerBlogCategoriesPage />} />
             <Route path="/admin/categories" element={<AdminCategoriesPage />} />
             <Route path="/admin/states" element={<AdminStatesPage />} />
             <Route path="/admin/media" element={<AdminMediaPage />} />
@@ -114,67 +128,76 @@ function MainLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-800 font-sans flex flex-col justify-between selection:bg-amber-300 selection:text-slate-950">
-      <div>
-        <Header />
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 pt-4 pb-16 md:pb-8">
-          <Suspense fallback={<PageLoadingFallback />}>
-            <Routes>
-              {/* Public Core Routes */}
-              <Route path="/" element={<HomePage />} />
-              <Route path="/latest-updates" element={<LatestUpdatesPage />} />
-              <Route path="/sarkari-yojana" element={<CategoryPage forcedCategory="Sarkari Yojana" />} />
-              <Route path="/sarkari-naukri" element={<StatesPage />} />
-              <Route path="/sarkari-naukri/:stateSlug" element={<StatePage />} />
-              <Route path="/state/:stateSlug" element={<StatePage />} />
-              <Route path="/jobs/:stateSlug" element={<StatePage />} />
-              <Route path="/states" element={<StatesPage />} />
-              <Route path="/results" element={<CategoryPage forcedCategory="Results" />} />
-              <Route path="/admit-card" element={<CategoryPage forcedCategory="Admit Card" />} />
-              <Route path="/answer-key" element={<CategoryPage forcedCategory="Answer Key" />} />
-              <Route path="/syllabus" element={<CategoryPage forcedCategory="Syllabus" />} />
-              <Route path="/scholarship" element={<CategoryPage forcedCategory="Scholarship" />} />
-              <Route path="/current-affairs" element={<CategoryPage forcedCategory="Current Affairs" />} />
-              
-              {/* Category Prefix Routes */}
-              <Route path="/category/:categorySlug" element={<CategoryPage />} />
+    <div className="min-h-screen bg-slate-200/70 text-slate-800 font-sans selection:bg-amber-300 selection:text-slate-950">
+      <div className="site-wrapper min-h-screen flex flex-col justify-between bg-slate-100">
+        <div className="w-full">
+          <Header />
+          <main className="w-full px-3 sm:px-6 pt-4 pb-16 md:pb-8">
+            <Suspense fallback={<PageLoadingFallback />}>
+              <Routes>
+                {/* Public Core Routes */}
+                <Route path="/" element={<HomePage />} />
+                <Route path="/latest-updates" element={<LatestUpdatesPage />} />
+                <Route path="/sarkari-yojana" element={<CategoryPage forcedCategory="Sarkari Yojana" />} />
+                <Route path="/sarkari-naukri" element={<StatesPage />} />
+                <Route path="/sarkari-naukri/:stateSlug" element={<StatePage />} />
+                <Route path="/state/:stateSlug" element={<StatePage />} />
+                <Route path="/jobs/:stateSlug" element={<StatePage />} />
+                <Route path="/states" element={<StatesPage />} />
+                <Route path="/results" element={<CategoryPage forcedCategory="Results" />} />
+                <Route path="/admit-card" element={<CategoryPage forcedCategory="Admit Card" />} />
+                <Route path="/answer-key" element={<CategoryPage forcedCategory="Answer Key" />} />
+                <Route path="/syllabus" element={<CategoryPage forcedCategory="Syllabus" />} />
+                <Route path="/scholarship" element={<CategoryPage forcedCategory="Scholarship" />} />
+                <Route path="/current-affairs" element={<CategoryPage forcedCategory="Current Affairs" />} />
+                
+                {/* Public Career Blogs */}
+                <Route path="/blogs" element={<CareerBlogListPage />} />
+                <Route path="/blogs/hindi" element={<CareerBlogListPage forcedLanguage="hindi" />} />
+                <Route path="/blogs/english" element={<CareerBlogListPage forcedLanguage="english" />} />
+                <Route path="/blogs/hindi/:slug" element={<CareerBlogDetailPage forcedLanguage="hindi" />} />
+                <Route path="/blogs/english/:slug" element={<CareerBlogDetailPage forcedLanguage="english" />} />
 
-              {/* Dynamic Post Routes */}
-              <Route path="/post/:slug" element={<PostPage />} />
-              <Route path="/posts/:slug" element={<PostPage />} />
-              <Route path="/search" element={<SearchPage />} />
+                {/* Category Prefix Routes */}
+                <Route path="/category/:categorySlug" element={<CategoryPage />} />
 
-              {/* Legal & Info */}
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/privacy-policy" element={<PrivacyPage />} />
-              <Route path="/disclaimer" element={<DisclaimerPage />} />
-              <Route path="/terms-and-conditions" element={<TermsPage />} />
-              <Route path="/editorial-policy" element={<EditorialPolicyPage />} />
-              <Route path="/content-policy" element={<EditorialPolicyPage />} />
+                {/* Dynamic Post Routes */}
+                <Route path="/post/:slug" element={<PostPage />} />
+                <Route path="/posts/:slug" element={<PostPage />} />
+                <Route path="/search" element={<SearchPage />} />
 
-              {/* Sitemap & Robots */}
-              <Route path="/sitemap.xml" element={<SitemapPage />} />
-              <Route path="/sitemap" element={<SitemapPage />} />
-              <Route path="/robots.txt" element={<RobotsPage />} />
-              <Route path="/robots" element={<RobotsPage />} />
+                {/* Legal & Info */}
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/privacy-policy" element={<PrivacyPage />} />
+                <Route path="/disclaimer" element={<DisclaimerPage />} />
+                <Route path="/terms-and-conditions" element={<TermsPage />} />
+                <Route path="/editorial-policy" element={<EditorialPolicyPage />} />
+                <Route path="/content-policy" element={<EditorialPolicyPage />} />
 
-              {/* Admin Login Route */}
-              <Route path="/admin/login" element={<AdminLoginPage />} />
+                {/* Sitemap & Robots */}
+                <Route path="/sitemap.xml" element={<SitemapPage />} />
+                <Route path="/sitemap" element={<SitemapPage />} />
+                <Route path="/robots.txt" element={<RobotsPage />} />
+                <Route path="/robots" element={<RobotsPage />} />
 
-              {/* Category Slug Fallback */}
-              <Route path="/:categorySlug" element={<CategoryPage />} />
+                {/* Admin Login Route */}
+                <Route path="/admin/login" element={<AdminLoginPage />} />
 
-              {/* 404 Catch All */}
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </Suspense>
+                {/* Category Slug Fallback */}
+                <Route path="/:categorySlug" element={<CategoryPage />} />
+
+                {/* 404 Catch All */}
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Suspense>
+          </main>
         </div>
-      </div>
 
-      <div>
-        <Footer />
-        <MobileBottomNav />
+        <div className="w-full">
+          <Footer />
+          <MobileBottomNav />
+        </div>
       </div>
     </div>
   );
